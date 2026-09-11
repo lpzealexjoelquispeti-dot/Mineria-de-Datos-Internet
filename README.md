@@ -1,98 +1,268 @@
-# Minería de Datos: Internet fijo y móvil en La Paz
+# Conectividad Digital en La Paz
 
-EDA del acceso declarado a Internet fijo y móvil en el departamento de La Paz, calculado desde los microdatos del **Censo de Población y Vivienda 2024**. El notebook está en español y cubre estructura, calidad, valores atípicos, distribución, relación urbana/rural, hipótesis y conclusiones.
+## Descripción
 
-## Fuente y archivos
+Aplicación web de solo lectura para visualizar y explorar el análisis del acceso a Internet fijo y móvil en el departamento de La Paz a partir del **Censo de Población y Vivienda 2024**.
 
-Coloque los originales, con sus nombres exactos, dentro de `Base de datos CSV/`:
+El proyecto conserva el notebook y los resultados del EDA, añade un pipeline Python reutilizable, expone los artefactos procesados mediante FastAPI y los presenta en un dashboard React. No incluye usuarios, autenticación, administración, pagos ni base de datos transaccional.
 
-| Archivo | Tamaño aproximado | Uso |
-|---|---:|---|
-| `Vivienda_CPV-2024.csv` | 490,86 MB | Única fuente de observaciones para todas las estadísticas |
-| `Diccionario de variables CPV 2024.xlsx` | 0,20 MB | Descripciones, categorías y catálogos; se lee en cada ejecución |
-| `Cuestionario censal 2024.pdf` | 21,07 MB | Preguntas y saltos; páginas PDF 2 y 3 revisadas visualmente |
-| `Persona_CPV-2024.csv` | 3.087,56 MB | Solo inspección del encabezado; no se calculan estadísticas ni se cruza |
-| `Emigracion_CPV-2024.csv` | 23,81 MB | Solo inspección del encabezado |
-| `Mortalidad_CPV-2024.csv` | 19,30 MB | Solo inspección del encabezado |
+La unidad de análisis es el registro de vivienda. El universo TIC comprende viviendas particulares (tipos 1–6) con personas presentes (ocupación 0/1). Los registros fuera de ese universo no se consideran viviendas sin Internet.
 
-Los seis archivos suman aproximadamente **3,64 GB** decimales. Los archivos `Zone.Identifier` son metadatos de descarga. El antiguo `La Paz - TIC.xlsx` no participa en el EDA; se conserva el archivo existente.
+## Arquitectura
 
-Se usan los archivos censales proporcionados localmente para el proyecto. Esta entrega no incluye una URL o un manifiesto oficial de descarga con el que certificar su integridad de origen. Las huellas SHA-256 permiten verificar que la ejecución no los modifica.
+```text
+Censo 2024 (CSV + diccionario oficial)
+                 ↓
+       Pipeline Python en src/
+                 ↓
+  outputs/ (JSON y CSV agregados pequeños)
+                 ↓
+            FastAPI
+                 ↓
+      React + TypeScript + Vite
+```
+
+FastAPI no abre los microdatos censales. `src.pipeline` realiza el trabajo intensivo una sola vez y genera tablas agregadas en `outputs/`. El backend carga esos archivos pequeños y los conserva en caché de proceso.
+
+El notebook usa las funciones estadísticas centrales de `src/mining.py` para la comparación departamental, las agregaciones geográficas y la detección IQR. Así se mantienen los mismos denominadores y la misma metodología entre el EDA y los resultados servidos.
+
+## Tecnologías
+
+- Python 3.12
+- Pandas y NumPy
+- SciPy no es necesario en esta versión: V de Cramér e IQR se calculan directamente con NumPy/Pandas para conservar el EDA existente
+- Matplotlib y seaborn para el EDA existente
+- openpyxl para el diccionario censal
+- FastAPI, Pydantic y Uvicorn
+- pytest y httpx
+- React 19, TypeScript y Vite
+- Recharts para visualización interactiva
+
+## Fuentes
+
+Coloque los originales con sus nombres exactos en `Base de datos CSV/`:
+
+| Archivo | Uso |
+|---|---|
+| `Vivienda_CPV-2024.csv` | Fuente de todas las observaciones estadísticas |
+| `Diccionario de variables CPV 2024.xlsx` | Categorías, descripciones y nombres geográficos oficiales |
+| `Cuestionario censal 2024.pdf` | Referencia documental |
+| `Persona_CPV-2024.csv` | Solo inspección del EDA; no participa en estadísticas |
+| `Emigracion_CPV-2024.csv` | Solo inventario/inspección |
+| `Mortalidad_CPV-2024.csv` | Solo inventario/inspección |
+
+Los microdatos están excluidos de Git y nunca son modificados por el pipeline. Las huellas SHA-256 de las fuentes utilizadas se guardan en `outputs/resumen_eda.json`.
 
 ## Instalación
 
-Use Python 3.12 y cree un entorno desde la raíz del proyecto:
+Desde la raíz del proyecto:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
+python -m pip install -r backend/requirements.txt
 ```
 
-En Windows PowerShell:
+Se mantienen dos archivos de dependencias deliberadamente:
 
-```powershell
-py -3.12 -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-```
+- `requirements.txt` contiene el entorno de minería y notebook.
+- `backend/requirements.txt` contiene únicamente la API y sus tests.
 
-Las dependencias incluyen pandas, NumPy, Matplotlib, seaborn, openpyxl (lectura del diccionario) y Jupyter. El notebook no requiere SciPy ni herramientas de PDF: la referencia visual al cuestionario está documentada en su introducción.
+Esta separación permite ejecutar el backend sin convertir sus dependencias en parte de la lógica estadística y no rompe el entorno original del EDA.
 
-## Ejecución
+## Procesamiento de datos
+
+### Regeneración completa desde los CSV originales
 
 Desde la raíz, con el entorno activado:
 
 ```bash
-jupyter notebook notebooks/EDA_Internet_LaPaz.ipynb
+python -m src.pipeline
 ```
 
-Seleccione el kernel del entorno y ejecute todas las celdas en orden. También puede abrir el notebook en VS Code y usar **Run All**. Las rutas funcionan desde la raíz o desde `notebooks/`; no contienen directorios personales.
+El proceso:
 
-Para ejecutar y guardar todas las salidas desde la terminal:
+1. lee el diccionario oficial incluido;
+2. detecta el código de La Paz;
+3. recorre `Vivienda_CPV-2024.csv` en bloques de 200.000 filas;
+4. conserva 16 variables y filtra La Paz;
+5. determina el universo TIC aplicable;
+6. valida categorías y correspondencias geográficas;
+7. calcula resumen, áreas, provincias, municipios, distribución y outliers;
+8. escribe artefactos agregados pequeños en `outputs/`.
+
+La copia departamental comprimida se guarda en:
+
+```text
+outputs/datos/vivienda_lapaz_seleccion.csv.gz
+```
+
+Esa copia también está excluida de Git porque contiene microdatos.
+
+### Regeneración rápida de desarrollo
+
+Si la copia comprimida ya existe:
+
+```bash
+python -m src.pipeline --from-cache
+```
+
+Esta opción vuelve a calcular los artefactos agregados desde las filas departamentales reales y evita recorrer otra vez todo el CSV nacional. No cambia fórmulas ni denominadores.
+
+### Notebook
+
+El EDA narrativo y sus nueve gráficos permanecen en `notebooks/EDA_Internet_LaPaz.ipynb`. Para ejecutarlo y guardar salidas:
 
 ```bash
 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=600 notebooks/EDA_Internet_LaPaz.ipynb
 ```
 
-El CSV utiliza `;`. El notebook detecta el separador, prueba UTF-8 con decodificación estricta y procesa **todo Vivienda** en bloques de 200.000 filas con 16 columnas seleccionadas de las 48 originales. Solo acumula La Paz; no utiliza muestras aleatorias. Después del filtro compacta los códigos repetidos como categorías, conservando sus valores originales. Reserva memoria para el dataset departamental y una copia del universo analítico. El espacio adicional incluye una copia comprimida de las columnas seleccionadas de La Paz.
+## Backend
 
-## Variables y criterios
+Iniciar la API:
 
-- `v19e_inetfijo`: Internet fijo en la vivienda.
-- `v19f_inetmovil`: Internet móvil (megas o datos).
-- `v19e_f`: indicador oficial de Internet fijo en la vivienda o Internet móvil.
-- Las tres usan `1 = Sí`, `2 = No`, `9 = Sin especificar`, según el diccionario.
-- `urbrur`: `1 = Urbana`, `2 = Rural`.
-- `v01_tipoviv`, `v02_condocup`: tipo y ocupación para determinar el universo TIC.
-- `v19c_compu`, `v19d_celular`, `v09_energia`, `tot_pers`: computadora/laptop/tablet, teléfono celular, fuente de electricidad y total de personas.
-- `v13_habitac`, `v14_dormit`: habitaciones y dormitorios; permiten revisar coherencia. El código 8 agrupa ocho o más.
-- `idep`, `iprov`, `imun`: componentes geográficos contrastados con los catálogos de la hoja PERSONA del diccionario. La Paz corresponde a `2`, representado como `02` en el CSV.
-- `i00`: identificador candidato, sin definición directa en el diccionario. Se verifica su unicidad en La Paz y no se eliminan filas.
-
-El diccionario no define directamente las cuatro últimas columnas. El notebook documenta esta limitación, valida la correspondencia de los códigos geográficos completos antes de asignar nombres y presenta las filas de origen de los catálogos. Consultar la hoja PERSONA del diccionario **no implica usar microdatos de personas**.
-
-La unidad es el registro de vivienda; la pregunta TIC se refiere al equipamiento del hogar. El universo aplicable comprende viviendas particulares (tipos 1–6) con personas presentes (ocupación 0/1; el código 0 indica sin jefe). Los vacíos fuera del universo no significan ausencia de Internet.
-
-La tasa principal usa **Sí / universo aplicable**, conservando «Sin especificar» en el denominador. Cada tabla ofrece también el número de respuestas determinadas (Sí/No) y la tasa entre ellas. Esto permite comparar fijo y móvil sobre la misma base y evaluar la sensibilidad a la no respuesta.
-
-Se mantiene el indicador combinado oficial. Las diferencias frente a una regla lógica conservadora se exponen sin corregir las fuentes. Las asociaciones y los valores atípicos son descriptivos; no prueban causalidad ni errores del dato.
-
-## Resultados y archivos generados
-
-```text
-notebooks/EDA_Internet_LaPaz.ipynb     Notebook ejecutado, tablas, interpretación y gráficos
-outputs/resumen_eda.json             Resultados y huellas de las fuentes utilizadas
-outputs/integridad_originales.json   Verificación de los seis originales al rehacer el EDA
-outputs/tablas/                      Tablas agregadas, catálogos y auditorías
-outputs/graficos/                    Nueve gráficos PNG
-outputs/datos/                      Copia comprimida local de La Paz (excluida de Git)
+```bash
+cd backend
+source ../.venv/bin/activate
+uvicorn app.main:app --reload
 ```
 
-El notebook comprueba totales, denominadores, códigos, geografía, duplicados y existencia de los nueve gráficos. Verifica al finalizar que Vivienda, el diccionario y el cuestionario conservan sus huellas SHA-256. Cada ejecución regenera las salidas a partir de los originales.
+Direcciones locales:
 
-## Git y microdatos grandes
+- API: `http://localhost:8000/api`
+- Swagger/OpenAPI: `http://localhost:8000/docs`
+- Esquema OpenAPI: `http://localhost:8000/openapi.json`
 
-`Base de datos CSV/` no estaba versionada y queda excluida mediante `.gitignore`, al igual que `outputs/datos/`, `.venv/`, `__pycache__/`, `.ipynb_checkpoints/` y `*.pyc`. Tras clonar, los integrantes deben colocar localmente la carpeta censal: Git no la descarga. No fuerce su inclusión con `git add -f`.
+Configuración opcional:
 
-Las tablas agregadas y gráficos sí son archivos pequeños revisables. No se requiere commit, push ni Pull Request para ejecutar el análisis.
+- `CENSO_OUTPUTS_DIR`: ruta alternativa a `outputs/`.
+- `CORS_ORIGINS`: orígenes locales separados por comas.
+
+Por defecto CORS permite únicamente `http://localhost:5173` y `http://127.0.0.1:5173`.
+
+## Endpoints
+
+| Método | Ruta | Datos procesados utilizados |
+|---|---|---|
+| GET | `/api/health` | Estado del proceso |
+| GET | `/api/resumen` | `outputs/resumen_eda.json` |
+| GET | `/api/conectividad/area` | Resumen por área del JSON procesado |
+| GET | `/api/conectividad/municipios` | `outputs/tablas/municipios.csv` o `municipios_area.csv` |
+| GET | `/api/conectividad/provincias` | `outputs/tablas/provincias.csv` |
+| GET | `/api/mineria/outliers` | Outliers y límites IQR del JSON procesado |
+| GET | `/api/mineria/distribucion` | Tasas municipales procesadas |
+| GET | `/api/calidad` | `faltantes.csv` y auditorías del JSON |
+| GET | `/api/metadata` | Diccionario utilizado, fuente y proceso |
+| GET | `/api/hallazgos` | Hallazgo, hipótesis y conclusiones generados por el pipeline |
+
+Parámetros de municipios:
+
+```text
+?limit=10&orden=mayor&metrica=internet&area=todos
+```
+
+- `orden`: `mayor` o `menor`.
+- `metrica`: `internet`, `fijo`, `movil` o `sin_internet`.
+- `area`: `todos`, `urbana` o `rural`.
+
+Provincias admite `limit`, `orden` y `metrica`.
+
+## Frontend
+
+Crear la configuración local y ejecutar Vite:
+
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
+
+El valor predeterminado es:
+
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+El dashboard queda disponible en `http://localhost:5173`.
+
+La página incluye:
+
+- cinco KPI derivados de `/api/resumen`;
+- barras de Internet fijo, móvil, combinado y sin Internet;
+- comparación urbano/rural;
+- top 10 y bottom 10 municipales;
+- distribución municipal por intervalos;
+- territorios atípicos según la regla de Tukey;
+- hallazgo, hipótesis y conclusiones del análisis;
+- filtros por área y métrica;
+- estados de carga, error y ausencia de datos;
+- diseño adaptable a escritorio, tableta y móvil.
+
+## Tests y compilación
+
+Backend:
+
+```bash
+cd backend
+source ../.venv/bin/activate
+pytest -q
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm run build
+```
+
+## Estructura del proyecto
+
+```text
+Mineria-de-Datos-Internet/
+├── backend/
+│   ├── app/
+│   │   ├── api/routes/
+│   │   ├── core/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   └── main.py
+│   ├── tests/
+│   └── requirements.txt
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── types/
+│   │   └── utils/
+│   ├── .env.example
+│   ├── package.json
+│   └── vite.config.ts
+├── src/
+│   ├── mining.py
+│   └── pipeline.py
+├── notebooks/
+│   └── EDA_Internet_LaPaz.ipynb
+├── outputs/
+│   ├── datos/
+│   ├── graficos/
+│   ├── tablas/
+│   └── resumen_eda.json
+├── Base de datos CSV/
+├── README.md
+└── requirements.txt
+```
+
+## Criterios estadísticos y limitaciones
+
+- `1 = Sí`, `2 = No` y `9 = Sin especificar` para los indicadores TIC.
+- La tasa principal usa `Sí / universo aplicable`; conserva “Sin especificar” en el denominador.
+- Los nombres de municipio y provincia se asignan únicamente cuando el código coincide con el catálogo oficial incluido.
+- Los outliers se calculan sobre el porcentaje municipal de algún Internet con la regla de Tukey, `1,5 × IQR`, igual que en el EDA.
+- Un outlier es un territorio inusual frente a la distribución; no implica un error.
+- La relación urbano/rural es descriptiva y no demuestra causalidad.
+- No se mide velocidad, calidad o precio del servicio ni cambios temporales.

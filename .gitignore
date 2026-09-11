@@ -3,6 +3,17 @@ __pycache__/
 .ipynb_checkpoints/
 *.pyc
 .DS_Store
+.pytest_cache/
+.ruff_cache/
+
+# Frontend local
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# Configuración local
+.env
+.sites-runtime/
 
 # Microdatos censales locales (3,64 GB); conservar originales fuera de Git.
 /Base de datos CSV/

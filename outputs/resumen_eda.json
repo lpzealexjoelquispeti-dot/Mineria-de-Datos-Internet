@@ -13,6 +13,8 @@
       "sha256": "e304a6d02a0a7c1d63b73f3fab4159e6526e77e545d8545932c5f2002f117059"
     }
   },
+  "generado_en": "2026-09-11T20:29:20.063754+00:00",
+  "proceso": "src.pipeline: lectura en bloques, filtro departamental y agregación censal",
   "registros_nacionales": 4490488,
   "columnas_originales": 48,
   "variables_seleccionadas": [
