@@ -1,0 +1,1492 @@
+{
+  "generado_en": "2026-09-19T00:32:46.929564+00:00",
+  "objetivo": "Estimar la probabilidad de que una vivienda u hogar del departamento de La Paz tenga acceso a Internet a partir de características censales.",
+  "target": {
+    "nombre": "TIENE_ACCESO_INTERNET",
+    "variable_fuente": "v19e_f",
+    "descripcion_fuente": "Internet fijo en la vivienda o internet móvil",
+    "codificacion": {
+      "0": "No tiene acceso",
+      "1": "Tiene acceso"
+    },
+    "clase_positiva": 1,
+    "nota_leakage": "Las variables de Internet fijo y móvil no se utilizan como predictores para evitar fuga de información (data leakage)."
+  },
+  "variables_utilizadas": [
+    {
+      "variable": "urbrur",
+      "descripcion": "Área Urbana - Rural",
+      "tipo": "Categórica",
+      "motivo": "La disponibilidad de infraestructura y cobertura digital puede diferir entre áreas urbanas y rurales."
+    },
+    {
+      "variable": "v01_tipoviv",
+      "descripcion": "1. La vivienda es: (Tipo de vivienda)",
+      "tipo": "Categórica",
+      "motivo": "El tipo de vivienda aproxima condiciones residenciales asociadas con la posibilidad de contratar o instalar conectividad."
+    },
+    {
+      "variable": "v09_energia",
+      "descripcion": "9. De donde proviene la energía eléctrica que usan en la vivienda",
+      "tipo": "Categórica",
+      "motivo": "La fuente de energía eléctrica representa una condición básica para usar equipos y servicios digitales."
+    },
+    {
+      "variable": "v19c_compu",
+      "descripcion": "19.3. Su hogar tiene: Computadora, laptop o tablet",
+      "tipo": "Categórica",
+      "motivo": "La disponibilidad de computadora, laptop o tablet está asociada con la capacidad de uso de servicios digitales, sin revelar directamente el target."
+    },
+    {
+      "variable": "v19d_celular",
+      "descripcion": "19.4. Su hogar tiene: Teléfono celular",
+      "tipo": "Categórica",
+      "motivo": "La tenencia de teléfono celular está asociada con la posibilidad de usar servicios digitales, pero no equivale a declarar Internet móvil."
+    },
+    {
+      "variable": "v13_habitac",
+      "descripcion": "13. Cuántos cuartos o habitaciones ocupan, sin contar baño y cocina",
+      "tipo": "Numérica",
+      "motivo": "La cantidad de habitaciones describe el tamaño físico de la vivienda y puede aproximar diferencias socioeconómicas."
+    },
+    {
+      "variable": "tot_pers",
+      "descripcion": "Total personas",
+      "tipo": "Numérica",
+      "motivo": "El tamaño del hogar puede relacionarse con la demanda compartida y la capacidad de sostener un servicio de Internet."
+    }
+  ],
+  "registros": {
+    "fuente_datos": "outputs/datos/vivienda_lapaz_seleccion.csv.gz (derivado reproducible)",
+    "registros_nacionales": 4490488,
+    "registros_lapaz": 1334496,
+    "universo_tic": 1069838,
+    "registros_target_valido": 1039341,
+    "registros_excluidos": 295155,
+    "motivos_exclusion": {
+      "fuera_universo_tic": 264658,
+      "target_sin_especificar_codigo_9": 30497,
+      "target_vacio_o_fuera_catalogo": 0
+    }
+  },
+  "distribucion_clases_total": {
+    "0_sin_internet": 290940,
+    "1_con_internet": 748401,
+    "porcentaje_clase_positiva": 72.00726229408826
+  },
+  "particion": {
+    "test_size": 0.2,
+    "random_state": 777,
+    "estratificada": true,
+    "train": 831472,
+    "test": 207869,
+    "distribucion_train": {
+      "0_sin_internet": 232752,
+      "1_con_internet": 598720
+    },
+    "distribucion_test": {
+      "0_sin_internet": 58188,
+      "1_con_internet": 149681
+    }
+  },
+  "metricas": {
+    "train": {
+      "accuracy": 0.80308056074047,
+      "precision": 0.8140124482585865,
+      "recall": 0.9416872661678247,
+      "f1": 0.873207588665169,
+      "roc_auc": 0.8622679190536877
+    },
+    "test": {
+      "accuracy": 0.8034435149060225,
+      "precision": 0.8144246493808184,
+      "recall": 0.9415824319719938,
+      "f1": 0.8733996009072543,
+      "roc_auc": 0.862539584406251
+    }
+  },
+  "matriz_confusion_test": {
+    "tn": 26074,
+    "fp": 32114,
+    "fn": 8744,
+    "tp": 140937,
+    "matriz": [
+      [
+        26074,
+        32114
+      ],
+      [
+        8744,
+        140937
+      ]
+    ]
+  },
+  "classification_report_test": {
+    "Sin Internet": {
+      "precision": 0.7488655293239129,
+      "recall": 0.44809926445315185,
+      "f1-score": 0.5606950089241555,
+      "support": 58188.0
+    },
+    "Con Internet": {
+      "precision": 0.8144246493808184,
+      "recall": 0.9415824319719938,
+      "f1-score": 0.8733996009072543,
+      "support": 149681.0
+    },
+    "accuracy": 0.8034435149060225,
+    "macro avg": {
+      "precision": 0.7816450893523657,
+      "recall": 0.6948408482125727,
+      "f1-score": 0.7170473049157049,
+      "support": 207869.0
+    },
+    "weighted avg": {
+      "precision": 0.7960729274892847,
+      "recall": 0.8034435149060225,
+      "f1-score": 0.7858653615627029,
+      "support": 207869.0
+    }
+  },
+  "baseline": {
+    "descripcion": "Predecir siempre la clase mayoritaria observada en train",
+    "clase_mayoritaria": 1,
+    "accuracy_test": 0.7200737002631465
+  },
+  "umbral_principal": 0.5,
+  "roc": {
+    "auc_test": 0.862539584406251,
+    "puntos": [
+      {
+        "fpr": 0.0,
+        "tpr": 0.0,
+        "threshold": null
+      },
+      {
+        "fpr": 3.43713480442703e-05,
+        "tpr": 0.00021378798912353607,
+        "threshold": 0.9947764517352308
+      },
+      {
+        "fpr": 3.43713480442703e-05,
+        "tpr": 0.0005411508474689506,
+        "threshold": 0.9940282320794777
+      },
+      {
+        "fpr": 3.43713480442703e-05,
+        "tpr": 0.0012760470600811059,
+        "threshold": 0.9931218700435246
+      },
+      {
+        "fpr": 5.1557022066405446e-05,
+        "tpr": 0.0022314121364769074,
+        "threshold": 0.9924776145413082
+      },
+      {
+        "fpr": 8.592837011067574e-05,
+        "tpr": 0.0040419291693668535,
+        "threshold": 0.9917532585373633
+      },
+      {
+        "fpr": 0.00010311404413281089,
+        "tpr": 0.006360192676425198,
+        "threshold": 0.9909783893000481
+      },
+      {
+        "fpr": 0.00020622808826562179,
+        "tpr": 0.013749240050507412,
+        "threshold": 0.9903356735877128
+      },
+      {
+        "fpr": 0.00024059943630989208,
+        "tpr": 0.01639486641591117,
+        "threshold": 0.9896648691455349
+      },
+      {
+        "fpr": 0.00044682752457551384,
+        "tpr": 0.03330416018065085,
+        "threshold": 0.9891106710416038
+      },
+      {
+        "fpr": 0.0005327558946861896,
+        "tpr": 0.037753622704284444,
+        "threshold": 0.9884642693929585
+      },
+      {
+        "fpr": 0.000807726679040352,
+        "tpr": 0.04848978828308202,
+        "threshold": 0.9877632993536039
+      },
+      {
+        "fpr": 0.0012201828555715956,
+        "tpr": 0.06404286449181927,
+        "threshold": 0.9870932432992215
+      },
+      {
+        "fpr": 0.001392039595792947,
+        "tpr": 0.06847896526613265,
+        "threshold": 0.9864132853595043
+      },
+      {
+        "fpr": 0.0015638963360142986,
+        "tpr": 0.07874746961872248,
+        "threshold": 0.9859721868657344
+      },
+      {
+        "fpr": 0.001993538186567677,
+        "tpr": 0.09720004542994769,
+        "threshold": 0.9851966045955736
+      },
+      {
+        "fpr": 0.0024919227332095965,
+        "tpr": 0.1087245542186383,
+        "threshold": 0.9844159671049566
+      },
+      {
+        "fpr": 0.0028871932357187047,
+        "tpr": 0.11925361268297245,
+        "threshold": 0.9837590969090297
+      },
+      {
+        "fpr": 0.0034886918264934353,
+        "tpr": 0.1383675950855486,
+        "threshold": 0.9829702368704268
+      },
+      {
+        "fpr": 0.004210490135423111,
+        "tpr": 0.15823651632471722,
+        "threshold": 0.9818500730001105
+      },
+      {
+        "fpr": 0.005035402488485599,
+        "tpr": 0.1786399075366947,
+        "threshold": 0.9809473933348583
+      },
+      {
+        "fpr": 0.005482230013061112,
+        "tpr": 0.1928835323120503,
+        "threshold": 0.9800168848397116
+      },
+      {
+        "fpr": 0.006032171581769437,
+        "tpr": 0.20887754624835483,
+        "threshold": 0.9791516957387059
+      },
+      {
+        "fpr": 0.007458582525606655,
+        "tpr": 0.24558227163100194,
+        "threshold": 0.9781806597912045
+      },
+      {
+        "fpr": 0.007871038702137899,
+        "tpr": 0.2532452348661487,
+        "threshold": 0.9772581304494278
+      },
+      {
+        "fpr": 0.00881625077335533,
+        "tpr": 0.27716944702400437,
+        "threshold": 0.9765622151329227
+      },
+      {
+        "fpr": 0.00981301986663917,
+        "tpr": 0.30049906133711024,
+        "threshold": 0.975603017101236
+      },
+      {
+        "fpr": 0.011256616484498522,
+        "tpr": 0.322612756462076,
+        "threshold": 0.9748690276944829
+      },
+      {
+        "fpr": 0.011772186705162576,
+        "tpr": 0.33314181492641015,
+        "threshold": 0.9736638248332207
+      },
+      {
+        "fpr": 0.01275177012442428,
+        "tpr": 0.34882850862834963,
+        "threshold": 0.9731123183938719
+      },
+      {
+        "fpr": 0.013782910565752388,
+        "tpr": 0.3676952986685017,
+        "threshold": 0.9723681184468148
+      },
+      {
+        "fpr": 0.015209321509589606,
+        "tpr": 0.387604305155631,
+        "threshold": 0.971355635436439
+      },
+      {
+        "fpr": 0.016395133017116932,
+        "tpr": 0.4009794162251722,
+        "threshold": 0.9700503761903175
+      },
+      {
+        "fpr": 0.017168488348113013,
+        "tpr": 0.40965787240865575,
+        "threshold": 0.9689561363219404
+      },
+      {
+        "fpr": 0.020743108544717125,
+        "tpr": 0.4390804444117824,
+        "threshold": 0.967242543238171
+      },
+      {
+        "fpr": 0.02213514814051007,
+        "tpr": 0.45025754771814724,
+        "threshold": 0.9656794223487233
+      },
+      {
+        "fpr": 0.02220389083659861,
+        "tpr": 0.45067844282173425,
+        "threshold": 0.964261474219832
+      },
+      {
+        "fpr": 0.022547604317041316,
+        "tpr": 0.4512930832904644,
+        "threshold": 0.961913466834157
+      },
+      {
+        "fpr": 0.022788203753351208,
+        "tpr": 0.45172734014337157,
+        "threshold": 0.9605340318236274
+      },
+      {
+        "fpr": 0.02306317453770537,
+        "tpr": 0.4523219379881214,
+        "threshold": 0.958517001777015
+      },
+      {
+        "fpr": 0.023458445040214475,
+        "tpr": 0.4534910910536407,
+        "threshold": 0.9565052677436034
+      },
+      {
+        "fpr": 0.023716230150546504,
+        "tpr": 0.4542593916395534,
+        "threshold": 0.9547688079865376
+      },
+      {
+        "fpr": 0.024197429023166288,
+        "tpr": 0.4554953534516739,
+        "threshold": 0.9526396098288129
+      },
+      {
+        "fpr": 0.024747370591874613,
+        "tpr": 0.4572123382393223,
+        "threshold": 0.9503498258651263
+      },
+      {
+        "fpr": 0.025555097270914966,
+        "tpr": 0.45903621702153247,
+        "threshold": 0.9468227123357021
+      },
+      {
+        "fpr": 0.026190967209733965,
+        "tpr": 0.4615415450190739,
+        "threshold": 0.9439040267060187
+      },
+      {
+        "fpr": 0.026947136866707914,
+        "tpr": 0.46411368176321643,
+        "threshold": 0.9407872463444628
+      },
+      {
+        "fpr": 0.027325221695194885,
+        "tpr": 0.46557011243912055,
+        "threshold": 0.9380425947002318
+      },
+      {
+        "fpr": 0.02794390595999175,
+        "tpr": 0.4675409704638531,
+        "threshold": 0.9361083883011545
+      },
+      {
+        "fpr": 0.028992232075341996,
+        "tpr": 0.46954523286188626,
+        "threshold": 0.9340650718209063
+      },
+      {
+        "fpr": 0.02983433010242662,
+        "tpr": 0.4715895805078801,
+        "threshold": 0.9302249366936307
+      },
+      {
+        "fpr": 0.03038427167113494,
+        "tpr": 0.4734268210394105,
+        "threshold": 0.9278976159382147
+      },
+      {
+        "fpr": 0.0318794253110607,
+        "tpr": 0.4773818988381959,
+        "threshold": 0.9254086760814798
+      },
+      {
+        "fpr": 0.032893380078366674,
+        "tpr": 0.4796667579719537,
+        "threshold": 0.921326148001132
+      },
+      {
+        "fpr": 0.03327146490685365,
+        "tpr": 0.4809094006587342,
+        "threshold": 0.9192221157080825
+      },
+      {
+        "fpr": 0.033976077541761185,
+        "tpr": 0.4830138761766691,
+        "threshold": 0.9170938537921661
+      },
+      {
+        "fpr": 0.03581494466212965,
+        "tpr": 0.4876303605668054,
+        "threshold": 0.9138798999389135
+      },
+      {
+        "fpr": 0.03602117275039527,
+        "tpr": 0.4880111704224317,
+        "threshold": 0.9090521061563921
+      },
+      {
+        "fpr": 0.036175843816594486,
+        "tpr": 0.4887393857603837,
+        "threshold": 0.9062350895052829
+      },
+      {
+        "fpr": 0.03648518594899292,
+        "tpr": 0.49018245468696764,
+        "threshold": 0.9009106120237066
+      },
+      {
+        "fpr": 0.03679452808139135,
+        "tpr": 0.49071692465977645,
+        "threshold": 0.8979725787427938
+      },
+      {
+        "fpr": 0.037155427235856194,
+        "tpr": 0.49171905585879305,
+        "threshold": 0.8944620969302162
+      },
+      {
+        "fpr": 0.03787722554478587,
+        "tpr": 0.49461187458662087,
+        "threshold": 0.8897823257531349
+      },
+      {
+        "fpr": 0.038478724135560596,
+        "tpr": 0.4962954550009687,
+        "threshold": 0.8849625641729258
+      },
+      {
+        "fpr": 0.03963016429504365,
+        "tpr": 0.49852018626278555,
+        "threshold": 0.8800028152264985
+      },
+      {
+        "fpr": 0.04091908984670379,
+        "tpr": 0.5020343263340037,
+        "threshold": 0.8770236783400343
+      },
+      {
+        "fpr": 0.04148621708943425,
+        "tpr": 0.503931694737475,
+        "threshold": 0.8724268165679181
+      },
+      {
+        "fpr": 0.0429298137072936,
+        "tpr": 0.5066775342227805,
+        "threshold": 0.8673991168876223
+      },
+      {
+        "fpr": 0.04476868082766206,
+        "tpr": 0.5104789519043833,
+        "threshold": 0.8624513378237386
+      },
+      {
+        "fpr": 0.04739808895304874,
+        "tpr": 0.5160775248695559,
+        "threshold": 0.8566289846010144
+      },
+      {
+        "fpr": 0.04873857152677528,
+        "tpr": 0.5191974933358275,
+        "threshold": 0.8511570008973163
+      },
+      {
+        "fpr": 0.05184917852478174,
+        "tpr": 0.5267535625764125,
+        "threshold": 0.8475640984120557
+      },
+      {
+        "fpr": 0.05545817006943012,
+        "tpr": 0.5319111978140179,
+        "threshold": 0.8435506315492187
+      },
+      {
+        "fpr": 0.05772667904035196,
+        "tpr": 0.5373227062887073,
+        "threshold": 0.8370793564929484
+      },
+      {
+        "fpr": 0.05939368942049907,
+        "tpr": 0.5424202136543717,
+        "threshold": 0.8337118473573091
+      },
+      {
+        "fpr": 0.061713755413487316,
+        "tpr": 0.5490075560692406,
+        "threshold": 0.8308760162411136
+      },
+      {
+        "fpr": 0.06480717673747165,
+        "tpr": 0.5566838810537076,
+        "threshold": 0.8262049910026888
+      },
+      {
+        "fpr": 0.06680071492403931,
+        "tpr": 0.5614339829370462,
+        "threshold": 0.8192294277011687
+      },
+      {
+        "fpr": 0.07042689214270983,
+        "tpr": 0.5708473353331418,
+        "threshold": 0.8153953297601753
+      },
+      {
+        "fpr": 0.07410462638344675,
+        "tpr": 0.5811492440590322,
+        "threshold": 0.8119763798560801
+      },
+      {
+        "fpr": 0.07946655667835292,
+        "tpr": 0.594985335480121,
+        "threshold": 0.8082668547050488
+      },
+      {
+        "fpr": 0.08290369148277996,
+        "tpr": 0.6022674888596415,
+        "threshold": 0.8023084700374985
+      },
+      {
+        "fpr": 0.08360830411768749,
+        "tpr": 0.6033163861812788,
+        "threshold": 0.7978435479746546
+      },
+      {
+        "fpr": 0.08558465663023304,
+        "tpr": 0.6065232060181319,
+        "threshold": 0.794581162198038
+      },
+      {
+        "fpr": 0.0900701175500103,
+        "tpr": 0.6147072774767672,
+        "threshold": 0.790683307703365
+      },
+      {
+        "fpr": 0.09562109025915996,
+        "tpr": 0.6259712321537135,
+        "threshold": 0.7866640642329542
+      },
+      {
+        "fpr": 0.10364680002749709,
+        "tpr": 0.6416178406076923,
+        "threshold": 0.7828806079051258
+      },
+      {
+        "fpr": 0.10878531656011549,
+        "tpr": 0.651512215979316,
+        "threshold": 0.7793645416125078
+      },
+      {
+        "fpr": 0.11002268508970922,
+        "tpr": 0.6528216674126976,
+        "threshold": 0.7745738201478763
+      },
+      {
+        "fpr": 0.11306454939162713,
+        "tpr": 0.6564159779798371,
+        "threshold": 0.7709591856564627
+      },
+      {
+        "fpr": 0.12382278132948374,
+        "tpr": 0.6682210835042524,
+        "threshold": 0.766854053900088
+      },
+      {
+        "fpr": 0.13258747508077268,
+        "tpr": 0.6793514206879965,
+        "threshold": 0.7637178868225885
+      },
+      {
+        "fpr": 0.14743589743589744,
+        "tpr": 0.696915440169427,
+        "threshold": 0.758477817714813
+      },
+      {
+        "fpr": 0.15956898329552485,
+        "tpr": 0.7103506791109092,
+        "threshold": 0.7547208003208026
+      },
+      {
+        "fpr": 0.16290300405581906,
+        "tpr": 0.7132702213373775,
+        "threshold": 0.7494880381865889
+      },
+      {
+        "fpr": 0.16948511720629683,
+        "tpr": 0.7184746226976035,
+        "threshold": 0.7436732766812212
+      },
+      {
+        "fpr": 0.18273527187736302,
+        "tpr": 0.7294579806388253,
+        "threshold": 0.7403237327911448
+      },
+      {
+        "fpr": 0.2076029421873926,
+        "tpr": 0.7470821279921968,
+        "threshold": 0.7354655311594711
+      },
+      {
+        "fpr": 0.23568433353956142,
+        "tpr": 0.7680734361742639,
+        "threshold": 0.7302947773147411
+      },
+      {
+        "fpr": 0.23735134391970852,
+        "tpr": 0.7690488438746401,
+        "threshold": 0.7262057457831361
+      },
+      {
+        "fpr": 0.23845122705712518,
+        "tpr": 0.7698505488338533,
+        "threshold": 0.7207115746569687
+      },
+      {
+        "fpr": 0.2400323090671616,
+        "tpr": 0.7710865106459738,
+        "threshold": 0.7165118769943938
+      },
+      {
+        "fpr": 0.24113219220457827,
+        "tpr": 0.7718882156051871,
+        "threshold": 0.7126379863491443
+      },
+      {
+        "fpr": 0.2429195023028803,
+        "tpr": 0.773458221150313,
+        "threshold": 0.7076741911396809
+      },
+      {
+        "fpr": 0.24474118374922665,
+        "tpr": 0.7745204802212706,
+        "threshold": 0.7036946120712442
+      },
+      {
+        "fpr": 0.2452051969478243,
+        "tpr": 0.7749346944501975,
+        "threshold": 0.699051107675038
+      },
+      {
+        "fpr": 0.24876263147040628,
+        "tpr": 0.7769523185975508,
+        "threshold": 0.6940385529204696
+      },
+      {
+        "fpr": 0.2506530556128411,
+        "tpr": 0.7781481951617105,
+        "threshold": 0.6896499723183832
+      },
+      {
+        "fpr": 0.2520107238605898,
+        "tpr": 0.7790167088675249,
+        "threshold": 0.6845547810892649
+      },
+      {
+        "fpr": 0.25470887468206505,
+        "tpr": 0.7812882062519625,
+        "threshold": 0.6801842852881056
+      },
+      {
+        "fpr": 0.256994569327009,
+        "tpr": 0.7827379560532065,
+        "threshold": 0.6746078335357057
+      },
+      {
+        "fpr": 0.25983020554066133,
+        "tpr": 0.784642005331338,
+        "threshold": 0.6697342573395488
+      },
+      {
+        "fpr": 0.2641266240461951,
+        "tpr": 0.7871673759528598,
+        "threshold": 0.6643783856596439
+      },
+      {
+        "fpr": 0.26761531587268855,
+        "tpr": 0.7890781061056513,
+        "threshold": 0.6593696265028366
+      },
+      {
+        "fpr": 0.270090052931876,
+        "tpr": 0.7908351761412604,
+        "threshold": 0.6539325248909373
+      },
+      {
+        "fpr": 0.2786485185948993,
+        "tpr": 0.7962667272399303,
+        "threshold": 0.6493986673273202
+      },
+      {
+        "fpr": 0.28165601154877296,
+        "tpr": 0.7985048202510673,
+        "threshold": 0.6446284737069218
+      },
+      {
+        "fpr": 0.28713824156183404,
+        "tpr": 0.8019855559489848,
+        "threshold": 0.6387356475081926
+      },
+      {
+        "fpr": 0.29461400976146285,
+        "tpr": 0.8068759562001857,
+        "threshold": 0.6331569051269096
+      },
+      {
+        "fpr": 0.30042276758094455,
+        "tpr": 0.8105637990125667,
+        "threshold": 0.6259304086440055
+      },
+      {
+        "fpr": 0.30217570633120233,
+        "tpr": 0.8118866121952686,
+        "threshold": 0.6202669441477203
+      },
+      {
+        "fpr": 0.30702206640544444,
+        "tpr": 0.8155210080103688,
+        "threshold": 0.6156507632110362
+      },
+      {
+        "fpr": 0.3079329071286176,
+        "tpr": 0.8159686266125962,
+        "threshold": 0.6111778291024025
+      },
+      {
+        "fpr": 0.31516807589193646,
+        "tpr": 0.8209458782343785,
+        "threshold": 0.6062230678037476
+      },
+      {
+        "fpr": 0.3269230769230769,
+        "tpr": 0.8288961190799099,
+        "threshold": 0.6001362675229291
+      },
+      {
+        "fpr": 0.336598611397539,
+        "tpr": 0.8356905686092423,
+        "threshold": 0.5934482961829706
+      },
+      {
+        "fpr": 0.3393483192410806,
+        "tpr": 0.8372338506557279,
+        "threshold": 0.588826342821727
+      },
+      {
+        "fpr": 0.34017323159414314,
+        "tpr": 0.8377015118819355,
+        "threshold": 0.5830775425384876
+      },
+      {
+        "fpr": 0.34745995737952845,
+        "tpr": 0.8422845918987714,
+        "threshold": 0.5781664719333668
+      },
+      {
+        "fpr": 0.35770261909672096,
+        "tpr": 0.8480969528530675,
+        "threshold": 0.5731120977628298
+      },
+      {
+        "fpr": 0.37499140716298895,
+        "tpr": 0.8585191173228399,
+        "threshold": 0.5679022595101225
+      },
+      {
+        "fpr": 0.38996012923626866,
+        "tpr": 0.868921239168632,
+        "threshold": 0.5609984606395484
+      },
+      {
+        "fpr": 0.39298480786416445,
+        "tpr": 0.8705246490870585,
+        "threshold": 0.5550507493844075
+      },
+      {
+        "fpr": 0.4030556128411356,
+        "tpr": 0.8746200252537062,
+        "threshold": 0.5490872255434945
+      },
+      {
+        "fpr": 0.40819412937375404,
+        "tpr": 0.878114122700944,
+        "threshold": 0.5442415511124717
+      },
+      {
+        "fpr": 0.426118787378841,
+        "tpr": 0.8864117690288013,
+        "threshold": 0.53868001496342
+      },
+      {
+        "fpr": 0.4546641919296075,
+        "tpr": 0.9008290965453197,
+        "threshold": 0.5322547395203282
+      },
+      {
+        "fpr": 0.4814566577301162,
+        "tpr": 0.9140171431243779,
+        "threshold": 0.5233579611790609
+      },
+      {
+        "fpr": 0.49279920258472537,
+        "tpr": 0.9185534570185929,
+        "threshold": 0.514637346588643
+      },
+      {
+        "fpr": 0.5142125524163058,
+        "tpr": 0.9267709328505288,
+        "threshold": 0.507813375593714
+      },
+      {
+        "fpr": 0.5519007355468482,
+        "tpr": 0.9415824319719938,
+        "threshold": 0.5002154625796333
+      },
+      {
+        "fpr": 0.5931979102220389,
+        "tpr": 0.9584850448620733,
+        "threshold": 0.48928851601947193
+      },
+      {
+        "fpr": 0.5965491166563552,
+        "tpr": 0.9598813476660364,
+        "threshold": 0.48005262123741566
+      },
+      {
+        "fpr": 0.6056403382140647,
+        "tpr": 0.9639500003340438,
+        "threshold": 0.47238165565589896
+      },
+      {
+        "fpr": 0.6132192204578264,
+        "tpr": 0.967290437664099,
+        "threshold": 0.461786208581182
+      },
+      {
+        "fpr": 0.6162610847597443,
+        "tpr": 0.9686132508468008,
+        "threshold": 0.4525962609485329
+      },
+      {
+        "fpr": 0.6253351206434317,
+        "tpr": 0.9718735176809348,
+        "threshold": 0.4424645947245382
+      },
+      {
+        "fpr": 0.647642125524163,
+        "tpr": 0.9805386121150981,
+        "threshold": 0.4293953186841912
+      },
+      {
+        "fpr": 0.6539664535643088,
+        "tpr": 0.9823357673986678,
+        "threshold": 0.41176676757676056
+      },
+      {
+        "fpr": 0.7010895717330033,
+        "tpr": 0.9958511768360714,
+        "threshold": 0.38837376190514067
+      },
+      {
+        "fpr": 0.7016223276276896,
+        "tpr": 0.9961250926971359,
+        "threshold": 0.33564649398774987
+      },
+      {
+        "fpr": 0.7021550835223758,
+        "tpr": 0.9962119440677173,
+        "threshold": 0.3003377546395794
+      },
+      {
+        "fpr": 0.7027222107651062,
+        "tpr": 0.9963923276835404,
+        "threshold": 0.26740624917406347
+      },
+      {
+        "fpr": 0.703340895029903,
+        "tpr": 0.9965593495500431,
+        "threshold": 0.23985183258345874
+      },
+      {
+        "fpr": 0.7042861071011205,
+        "tpr": 0.9968065419124672,
+        "threshold": 0.22073268027376727
+      },
+      {
+        "fpr": 0.7052656905203822,
+        "tpr": 0.9971405856454727,
+        "threshold": 0.2086819451375832
+      },
+      {
+        "fpr": 0.7060218601773561,
+        "tpr": 0.9972407987653744,
+        "threshold": 0.1921700007643905
+      },
+      {
+        "fpr": 0.7075685708393483,
+        "tpr": 0.9975347572504192,
+        "threshold": 0.1721906637322273
+      },
+      {
+        "fpr": 0.7082388121262115,
+        "tpr": 0.9975547998743995,
+        "threshold": 0.15600209544803925
+      },
+      {
+        "fpr": 0.7092012098714512,
+        "tpr": 0.9976683747436215,
+        "threshold": 0.14491318148113164
+      },
+      {
+        "fpr": 0.710197978964735,
+        "tpr": 0.9977485452395427,
+        "threshold": 0.13572936003153552
+      },
+      {
+        "fpr": 0.7112634907541073,
+        "tpr": 0.9978153539861438,
+        "threshold": 0.12291453980695106
+      },
+      {
+        "fpr": 0.7126727160239225,
+        "tpr": 0.9978754818580848,
+        "threshold": 0.11390072029912875
+      },
+      {
+        "fpr": 0.7146662542104901,
+        "tpr": 0.997948971479346,
+        "threshold": 0.10643845186696617
+      },
+      {
+        "fpr": 0.7167457207671685,
+        "tpr": 0.9980224611006073,
+        "threshold": 0.09886737139523688
+      },
+      {
+        "fpr": 0.7192892005224445,
+        "tpr": 0.9981360359698291,
+        "threshold": 0.09278415632681199
+      },
+      {
+        "fpr": 0.7213171100570565,
+        "tpr": 0.9982028447164303,
+        "threshold": 0.08517659592809035
+      },
+      {
+        "fpr": 0.7251495153639925,
+        "tpr": 0.9983899092069134,
+        "threshold": 0.07980754030323325
+      },
+      {
+        "fpr": 0.728895992300818,
+        "tpr": 0.9985235267001156,
+        "threshold": 0.07358895226490944
+      },
+      {
+        "fpr": 0.7326424692376435,
+        "tpr": 0.9987172720652587,
+        "threshold": 0.0697245447534236
+      },
+      {
+        "fpr": 0.7382449989688595,
+        "tpr": 0.9987974425611801,
+        "threshold": 0.06602375528944669
+      },
+      {
+        "fpr": 0.7447068124011824,
+        "tpr": 0.9990245922996238,
+        "threshold": 0.06387798106839883
+      },
+      {
+        "fpr": 0.7490719736028048,
+        "tpr": 0.9990579966729244,
+        "threshold": 0.06065173918381941
+      },
+      {
+        "fpr": 0.7524747370591874,
+        "tpr": 0.9991181245448654,
+        "threshold": 0.05798408074047045
+      },
+      {
+        "fpr": 0.7651405788135011,
+        "tpr": 0.9993252316593288,
+        "threshold": 0.055592357262104826
+      },
+      {
+        "fpr": 0.7800749295387365,
+        "tpr": 0.999458849152531,
+        "threshold": 0.051809484109211205
+      },
+      {
+        "fpr": 0.7821028390733484,
+        "tpr": 0.999458849152531,
+        "threshold": 0.048154394440887455
+      },
+      {
+        "fpr": 0.7842854196741597,
+        "tpr": 0.9994655300271912,
+        "threshold": 0.04562624411416055
+      },
+      {
+        "fpr": 0.7868804564515021,
+        "tpr": 0.9994722109018512,
+        "threshold": 0.043570808144780704
+      },
+      {
+        "fpr": 0.788409981439472,
+        "tpr": 0.9994722109018512,
+        "threshold": 0.04183952213096697
+      },
+      {
+        "fpr": 0.7915721454595449,
+        "tpr": 0.9994788917765114,
+        "threshold": 0.04024326768613135
+      },
+      {
+        "fpr": 0.7933938269058912,
+        "tpr": 0.9994788917765114,
+        "threshold": 0.03856737223678596
+      },
+      {
+        "fpr": 0.8009211521275864,
+        "tpr": 0.9994989344004918,
+        "threshold": 0.03700948036132535
+      },
+      {
+        "fpr": 0.8061799683783598,
+        "tpr": 0.9995390196484524,
+        "threshold": 0.03497832200398628
+      },
+      {
+        "fpr": 0.80899841891799,
+        "tpr": 0.9995523813977726,
+        "threshold": 0.03297256387460443
+      },
+      {
+        "fpr": 0.8153914896542243,
+        "tpr": 0.9995991475203934,
+        "threshold": 0.03164846408611363
+      },
+      {
+        "fpr": 0.8195160514195367,
+        "tpr": 0.9996325518936939,
+        "threshold": 0.03020323745335083
+      },
+      {
+        "fpr": 0.8208221626452189,
+        "tpr": 0.999639232768354,
+        "threshold": 0.02919716092346388
+      },
+      {
+        "fpr": 0.826424692376435,
+        "tpr": 0.9996525945176743,
+        "threshold": 0.028320514767879525
+      },
+      {
+        "fpr": 0.8385749639100846,
+        "tpr": 0.9997127223896153,
+        "threshold": 0.02721436035947902
+      },
+      {
+        "fpr": 0.840929401251117,
+        "tpr": 0.9997194032642753,
+        "threshold": 0.02579930776572061
+      },
+      {
+        "fpr": 0.846136660479824,
+        "tpr": 0.9997194032642753,
+        "threshold": 0.025037077142685743
+      },
+      {
+        "fpr": 0.8643362892692651,
+        "tpr": 0.9998062546348568,
+        "threshold": 0.02417479881464354
+      },
+      {
+        "fpr": 0.8754554203615866,
+        "tpr": 0.9998530207574776,
+        "threshold": 0.022825865082743504
+      },
+      {
+        "fpr": 0.8820375335120644,
+        "tpr": 0.9998663825067978,
+        "threshold": 0.02201429866119009
+      },
+      {
+        "fpr": 0.9097236543617241,
+        "tpr": 0.9999465530027191,
+        "threshold": 0.0208985400998213
+      },
+      {
+        "fpr": 0.934385096583488,
+        "tpr": 0.9999933191253398,
+        "threshold": 0.019828629087073234
+      },
+      {
+        "fpr": 0.9408297243417887,
+        "tpr": 1.0,
+        "threshold": 0.01908706946193489
+      },
+      {
+        "fpr": 0.9459854265484292,
+        "tpr": 1.0,
+        "threshold": 0.017692881740256187
+      },
+      {
+        "fpr": 0.9583591118443665,
+        "tpr": 1.0,
+        "threshold": 0.01666089196781826
+      },
+      {
+        "fpr": 1.0,
+        "tpr": 1.0,
+        "threshold": 0.014298899186594199
+      }
+    ]
+  },
+  "coeficientes_principales": [
+    {
+      "feature": "categoricas__v19d_celular_2",
+      "variable_original": "v19d_celular",
+      "categoria_codigo": "2",
+      "categoria": "No",
+      "descripcion": "19.4. Su hogar tiene: Teléfono celular: No (referencia: Sí)",
+      "coeficiente": -3.8394718548183198,
+      "odds_ratio": 0.021504956085289007,
+      "impacto_absoluto": 3.8394718548183198,
+      "coeficiente_statsmodels": -3.829666396837249,
+      "p_value": 0.0,
+      "ci_95_inferior": -3.8639248045334096,
+      "ci_95_superior": -3.795407989141088,
+      "odds_ratio_statsmodels": 0.021716859234462326,
+      "or_ci_95_inferior": 0.02098547379761029,
+      "or_ci_95_superior": 0.022473734906245352
+    },
+    {
+      "feature": "categoricas__v19c_compu_2",
+      "variable_original": "v19c_compu",
+      "categoria_codigo": "2",
+      "categoria": "No",
+      "descripcion": "19.3. Su hogar tiene: Computadora, laptop o tablet: No (referencia: Sí)",
+      "coeficiente": -2.3819475539388035,
+      "odds_ratio": 0.09237050567529746,
+      "impacto_absoluto": 2.3819475539388035,
+      "coeficiente_statsmodels": -2.386577838374268,
+      "p_value": 0.0,
+      "ci_95_inferior": -2.41018798656575,
+      "ci_95_superior": -2.3629676901827863,
+      "odds_ratio_statsmodels": 0.09194379262434939,
+      "or_ci_95_inferior": 0.08979841209035878,
+      "or_ci_95_superior": 0.0941404286040487
+    },
+    {
+      "feature": "categoricas__urbrur_2",
+      "variable_original": "urbrur",
+      "categoria_codigo": "2",
+      "categoria": "Rural",
+      "descripcion": "Área Urbana - Rural: Rural (referencia: Urbana)",
+      "coeficiente": -1.0132016416580265,
+      "odds_ratio": 0.3630547456383124,
+      "impacto_absoluto": 1.0132016416580265,
+      "coeficiente_statsmodels": -1.014437012135549,
+      "p_value": 0.0,
+      "ci_95_inferior": -1.0275293843028543,
+      "ci_95_superior": -1.0013446399682437,
+      "odds_ratio_statsmodels": 0.3626065154460049,
+      "or_ci_95_inferior": 0.3578900780426579,
+      "or_ci_95_superior": 0.3673851081957682
+    },
+    {
+      "feature": "categoricas__v01_tipoviv_3",
+      "variable_original": "v01_tipoviv",
+      "categoria_codigo": "3",
+      "categoria": "Departamento",
+      "descripcion": "1. La vivienda es: (Tipo de vivienda): Departamento (referencia: Casa)",
+      "coeficiente": 0.6641717014322918,
+      "odds_ratio": 1.942880569475542,
+      "impacto_absoluto": 0.6641717014322918,
+      "coeficiente_statsmodels": 0.6733771594946764,
+      "p_value": 1.614100982521065e-265,
+      "ci_95_inferior": 0.6354648401382972,
+      "ci_95_superior": 0.7112894788510555,
+      "odds_ratio_statsmodels": 1.960848248553921,
+      "or_ci_95_inferior": 1.8878995089939683,
+      "or_ci_95_superior": 2.0366157391003714
+    },
+    {
+      "feature": "categoricas__v09_energia_5",
+      "variable_original": "v09_energia",
+      "categoria_codigo": "5",
+      "categoria": "No tiene",
+      "descripcion": "9. De donde proviene la energía eléctrica que usan en la vivienda: No tiene (referencia: Servicio público de energía eléctrica)",
+      "coeficiente": -0.37991710446917915,
+      "odds_ratio": 0.68391810061658,
+      "impacto_absoluto": 0.37991710446917915,
+      "coeficiente_statsmodels": -0.38257068839169883,
+      "p_value": 0.0,
+      "ci_95_inferior": -0.40079745687641116,
+      "ci_95_superior": -0.3643439199069865,
+      "odds_ratio_statsmodels": 0.6821056723192777,
+      "or_ci_95_inferior": 0.6697857077897034,
+      "or_ci_95_superior": 0.6946522489193169
+    },
+    {
+      "feature": "categoricas__v09_energia_3",
+      "variable_original": "v09_energia",
+      "categoria_codigo": "3",
+      "categoria": "Panel solar",
+      "descripcion": "9. De donde proviene la energía eléctrica que usan en la vivienda: Panel solar (referencia: Servicio público de energía eléctrica)",
+      "coeficiente": -0.36700070445019845,
+      "odds_ratio": 0.6928091569946717,
+      "impacto_absoluto": 0.36700070445019845,
+      "coeficiente_statsmodels": -0.35164705819730663,
+      "p_value": 2.3369562803238187e-36,
+      "ci_95_inferior": -0.4063814864788378,
+      "ci_95_superior": -0.29691262991577544,
+      "odds_ratio_statsmodels": 0.7035283827386131,
+      "or_ci_95_inferior": 0.6660560275838403,
+      "or_ci_95_superior": 0.7431089350159901
+    },
+    {
+      "feature": "categoricas__v01_tipoviv_5",
+      "variable_original": "v01_tipoviv",
+      "categoria_codigo": "5",
+      "categoria": "Vivienda improvisada o vivienda móvil",
+      "descripcion": "1. La vivienda es: (Tipo de vivienda): Vivienda improvisada o vivienda móvil (referencia: Casa)",
+      "coeficiente": 0.31298674467604387,
+      "odds_ratio": 1.3675034042068333,
+      "impacto_absoluto": 0.31298674467604387,
+      "coeficiente_statsmodels": 0.3363705313639123,
+      "p_value": 1.5353820456153453e-24,
+      "ci_95_inferior": 0.2718926082916721,
+      "ci_95_superior": 0.4008484544361525,
+      "odds_ratio_statsmodels": 1.3998576198803052,
+      "or_ci_95_inferior": 1.3124460479194566,
+      "or_ci_95_superior": 1.4930909800394412
+    },
+    {
+      "feature": "categoricas__v01_tipoviv_4",
+      "variable_original": "v01_tipoviv",
+      "categoria_codigo": "4",
+      "categoria": "Cuarto(s) o habitación(es) suelta(s)",
+      "descripcion": "1. La vivienda es: (Tipo de vivienda): Cuarto(s) o habitación(es) suelta(s) (referencia: Casa)",
+      "coeficiente": 0.21036411219839057,
+      "odds_ratio": 1.2341273389762824,
+      "impacto_absoluto": 0.21036411219839057,
+      "coeficiente_statsmodels": 0.22038552311748744,
+      "p_value": 6.417871073687893e-66,
+      "ci_95_inferior": 0.19519728671128242,
+      "ci_95_superior": 0.24557375952369245,
+      "odds_ratio_statsmodels": 1.2465572145860788,
+      "or_ci_95_inferior": 1.2155507748501915,
+      "or_ci_95_superior": 1.2783545709376984
+    },
+    {
+      "feature": "categoricas__v01_tipoviv_2",
+      "variable_original": "v01_tipoviv",
+      "categoria_codigo": "2",
+      "categoria": "Choza, pahuichi",
+      "descripcion": "1. La vivienda es: (Tipo de vivienda): Choza, pahuichi (referencia: Casa)",
+      "coeficiente": 0.15528075267665958,
+      "odds_ratio": 1.1679858302260413,
+      "impacto_absoluto": 0.15528075267665958,
+      "coeficiente_statsmodels": 0.15878660140173068,
+      "p_value": 6.610351698249845e-20,
+      "ci_95_inferior": 0.12471379489892309,
+      "ci_95_superior": 0.19285940790453826,
+      "odds_ratio_statsmodels": 1.172087798097826,
+      "or_ci_95_inferior": 1.1328241866048525,
+      "or_ci_95_superior": 1.2127122837720714
+    },
+    {
+      "feature": "categoricas__v09_energia_2",
+      "variable_original": "v09_energia",
+      "categoria_codigo": "2",
+      "categoria": "Motor propio (Generador)",
+      "descripcion": "9. De donde proviene la energía eléctrica que usan en la vivienda: Motor propio (Generador) (referencia: Servicio público de energía eléctrica)",
+      "coeficiente": 0.14298002773461443,
+      "odds_ratio": 1.1537067592983332,
+      "impacto_absoluto": 0.14298002773461443,
+      "coeficiente_statsmodels": 0.14419295934271165,
+      "p_value": 0.0002678487883326654,
+      "ci_95_inferior": 0.06664918360172073,
+      "ci_95_superior": 0.22173673508370256,
+      "odds_ratio_statsmodels": 1.1551069757048635,
+      "or_ci_95_inferior": 1.068920417578801,
+      "or_ci_95_superior": 1.2482427160894543
+    }
+  ],
+  "statsmodels": {
+    "metodo": "statsmodels.api.Logit sobre X_train preprocesado",
+    "convergio": true,
+    "pseudo_r2_mcfadden": 0.3506364677077416,
+    "aic": 640259.9110398983,
+    "bic": 640434.3753334428,
+    "variables_significativas_0_05": [
+      {
+        "feature": "categoricas__urbrur_2",
+        "coeficiente_statsmodels": -1.014437012135549,
+        "p_value": 0.0,
+        "ci_95_inferior": -1.0275293843028543,
+        "ci_95_superior": -1.0013446399682437,
+        "odds_ratio_statsmodels": 0.3626065154460049,
+        "or_ci_95_inferior": 0.3578900780426579,
+        "or_ci_95_superior": 0.3673851081957682,
+        "descripcion": "Área Urbana - Rural: Rural (referencia: Urbana)"
+      },
+      {
+        "feature": "categoricas__v19d_celular_2",
+        "coeficiente_statsmodels": -3.829666396837249,
+        "p_value": 0.0,
+        "ci_95_inferior": -3.8639248045334096,
+        "ci_95_superior": -3.795407989141088,
+        "odds_ratio_statsmodels": 0.021716859234462326,
+        "or_ci_95_inferior": 0.02098547379761029,
+        "or_ci_95_superior": 0.022473734906245352,
+        "descripcion": "19.4. Su hogar tiene: Teléfono celular: No (referencia: Sí)"
+      },
+      {
+        "feature": "categoricas__v19c_compu_2",
+        "coeficiente_statsmodels": -2.386577838374268,
+        "p_value": 0.0,
+        "ci_95_inferior": -2.41018798656575,
+        "ci_95_superior": -2.3629676901827863,
+        "odds_ratio_statsmodels": 0.09194379262434939,
+        "or_ci_95_inferior": 0.08979841209035878,
+        "or_ci_95_superior": 0.0941404286040487,
+        "descripcion": "19.3. Su hogar tiene: Computadora, laptop o tablet: No (referencia: Sí)"
+      },
+      {
+        "feature": "categoricas__v09_energia_5",
+        "coeficiente_statsmodels": -0.38257068839169883,
+        "p_value": 0.0,
+        "ci_95_inferior": -0.40079745687641116,
+        "ci_95_superior": -0.3643439199069865,
+        "odds_ratio_statsmodels": 0.6821056723192777,
+        "or_ci_95_inferior": 0.6697857077897034,
+        "or_ci_95_superior": 0.6946522489193169,
+        "descripcion": "9. De donde proviene la energía eléctrica que usan en la vivienda: No tiene (referencia: Servicio público de energía eléctrica)"
+      },
+      {
+        "feature": "numericas__tot_pers",
+        "coeficiente_statsmodels": 0.13810663762649653,
+        "p_value": 0.0,
+        "ci_95_inferior": 0.13443572392742742,
+        "ci_95_superior": 0.14177755132556563,
+        "odds_ratio_statsmodels": 1.1480979741895179,
+        "or_ci_95_inferior": 1.1438911318099978,
+        "or_ci_95_superior": 1.1523202879039525,
+        "descripcion": "Total personas (incremento de una unidad)"
+      },
+      {
+        "feature": "categoricas__v01_tipoviv_3",
+        "coeficiente_statsmodels": 0.6733771594946764,
+        "p_value": 1.614100982521065e-265,
+        "ci_95_inferior": 0.6354648401382972,
+        "ci_95_superior": 0.7112894788510555,
+        "odds_ratio_statsmodels": 1.960848248553921,
+        "or_ci_95_inferior": 1.8878995089939683,
+        "or_ci_95_superior": 2.0366157391003714,
+        "descripcion": "1. La vivienda es: (Tipo de vivienda): Departamento (referencia: Casa)"
+      },
+      {
+        "feature": "categoricas__v01_tipoviv_4",
+        "coeficiente_statsmodels": 0.22038552311748744,
+        "p_value": 6.417871073687893e-66,
+        "ci_95_inferior": 0.19519728671128242,
+        "ci_95_superior": 0.24557375952369245,
+        "odds_ratio_statsmodels": 1.2465572145860788,
+        "or_ci_95_inferior": 1.2155507748501915,
+        "or_ci_95_superior": 1.2783545709376984,
+        "descripcion": "1. La vivienda es: (Tipo de vivienda): Cuarto(s) o habitación(es) suelta(s) (referencia: Casa)"
+      },
+      {
+        "feature": "categoricas__v09_energia_3",
+        "coeficiente_statsmodels": -0.35164705819730663,
+        "p_value": 2.3369562803238187e-36,
+        "ci_95_inferior": -0.4063814864788378,
+        "ci_95_superior": -0.29691262991577544,
+        "odds_ratio_statsmodels": 0.7035283827386131,
+        "or_ci_95_inferior": 0.6660560275838403,
+        "or_ci_95_superior": 0.7431089350159901,
+        "descripcion": "9. De donde proviene la energía eléctrica que usan en la vivienda: Panel solar (referencia: Servicio público de energía eléctrica)"
+      },
+      {
+        "feature": "categoricas__v01_tipoviv_5",
+        "coeficiente_statsmodels": 0.3363705313639123,
+        "p_value": 1.5353820456153453e-24,
+        "ci_95_inferior": 0.2718926082916721,
+        "ci_95_superior": 0.4008484544361525,
+        "odds_ratio_statsmodels": 1.3998576198803052,
+        "or_ci_95_inferior": 1.3124460479194566,
+        "or_ci_95_superior": 1.4930909800394412,
+        "descripcion": "1. La vivienda es: (Tipo de vivienda): Vivienda improvisada o vivienda móvil (referencia: Casa)"
+      },
+      {
+        "feature": "numericas__v13_habitac",
+        "coeficiente_statsmodels": 0.02339846922765506,
+        "p_value": 1.6307634670159485e-20,
+        "ci_95_inferior": 0.01845882546208418,
+        "ci_95_superior": 0.028338112993225938,
+        "odds_ratio_statsmodels": 1.023674361021674,
+        "or_ci_95_inferior": 1.0186302426765503,
+        "or_ci_95_superior": 1.028743457154432,
+        "descripcion": "13. Cuántos cuartos o habitaciones ocupan, sin contar baño y cocina (incremento de una unidad)"
+      },
+      {
+        "feature": "categoricas__v01_tipoviv_2",
+        "coeficiente_statsmodels": 0.15878660140173068,
+        "p_value": 6.610351698249845e-20,
+        "ci_95_inferior": 0.12471379489892309,
+        "ci_95_superior": 0.19285940790453826,
+        "odds_ratio_statsmodels": 1.172087798097826,
+        "or_ci_95_inferior": 1.1328241866048525,
+        "or_ci_95_superior": 1.2127122837720714,
+        "descripcion": "1. La vivienda es: (Tipo de vivienda): Choza, pahuichi (referencia: Casa)"
+      },
+      {
+        "feature": "categoricas__v09_energia_4",
+        "coeficiente_statsmodels": -0.16406905002700545,
+        "p_value": 1.029287282722619e-05,
+        "ci_95_inferior": -0.2369719533708153,
+        "ci_95_superior": -0.09116614668319559,
+        "odds_ratio_statsmodels": 0.8486834182439899,
+        "or_ci_95_inferior": 0.7890134168740132,
+        "or_ci_95_superior": 0.9128660286360024,
+        "descripcion": "9. De donde proviene la energía eléctrica que usan en la vivienda: Otro (referencia: Servicio público de energía eléctrica)"
+      },
+      {
+        "feature": "categoricas__v09_energia_2",
+        "coeficiente_statsmodels": 0.14419295934271165,
+        "p_value": 0.0002678487883326654,
+        "ci_95_inferior": 0.06664918360172073,
+        "ci_95_superior": 0.22173673508370256,
+        "odds_ratio_statsmodels": 1.1551069757048635,
+        "or_ci_95_inferior": 1.068920417578801,
+        "or_ci_95_superior": 1.2482427160894543,
+        "descripcion": "9. De donde proviene la energía eléctrica que usan en la vivienda: Motor propio (Generador) (referencia: Servicio público de energía eléctrica)"
+      }
+    ]
+  },
+  "interpretacion_primera_iteracion": "Las métricas de train y test son cercanas, lo que indica un comportamiento consistente sin una señal importante de sobreajuste."
+}

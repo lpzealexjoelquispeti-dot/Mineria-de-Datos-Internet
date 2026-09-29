@@ -6,6 +6,7 @@ import { DistributionChart } from "../components/DistributionChart";
 import { FindingsSection } from "../components/FindingsSection";
 import { Header } from "../components/Header";
 import { KpiCard } from "../components/KpiCard";
+import { LogisticRegressionSection } from "../components/LogisticRegressionSection";
 import { OutliersSection } from "../components/OutliersSection";
 import { OverviewChart } from "../components/OverviewChart";
 import { RankingChart } from "../components/RankingChart";
@@ -73,6 +74,7 @@ export default function Dashboard() {
 
           <OutliersSection outliers={data.outliers} />
           <FindingsSection findings={data.hallazgos} />
+          <LogisticRegressionSection model={data.regresion} />
 
           <footer className="method-footer">
             <div>
