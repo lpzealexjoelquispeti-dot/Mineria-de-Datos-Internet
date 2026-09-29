@@ -2,7 +2,11 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends
 
-from app.schemas.responses import DistribucionResponse, OutliersResponse
+from app.schemas.responses import (
+    DistribucionResponse,
+    OutliersResponse,
+    RegresionLogisticaResponse,
+)
 from app.services.data_service import DataService, get_data_service
 
 
@@ -22,3 +26,9 @@ def get_distribution(
 ) -> DistribucionResponse:
     return service.get_distribution(metrica, area)
 
+
+@router.get("/regresion-logistica", response_model=RegresionLogisticaResponse)
+def get_logistic_regression(
+    service: DataService = Depends(get_data_service),
+) -> RegresionLogisticaResponse:
+    return service.get_logistic_regression()

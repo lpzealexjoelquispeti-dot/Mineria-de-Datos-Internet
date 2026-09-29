@@ -55,3 +55,31 @@ async def test_conectividad_area_partitions_universe() -> None:
     assert [item["area"] for item in body["items"]] == ["Urbana", "Rural"]
     assert sum(item["total"] for item in body["items"]) == raw["universo_tic"]
     assert body["brecha_urbano_rural_pp"] > 0
+
+
+@pytest.mark.anyio
+async def test_regresion_logistica_uses_saved_results_without_leakage() -> None:
+    raw = json.loads(
+        (
+            Path(__file__).resolve().parents[2]
+            / "outputs"
+            / "modelado"
+            / "metricas_regresion_logistica.json"
+        ).read_text(encoding="utf-8")
+    )
+    response = await get("/api/mineria/regresion-logistica")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["target"]["nombre"] == "TIENE_ACCESO_INTERNET"
+    assert body["target"]["variable_fuente"] == "v19e_f"
+    assert body["metricas"]["test"] == raw["metricas"]["test"]
+    assert body["particion"]["train"] + body["particion"]["test"] == body["registros"][
+        "registros_target_valido"
+    ]
+    predictors = {item["variable"] for item in body["variables_utilizadas"]}
+    assert predictors.isdisjoint({"v19e_inetfijo", "v19f_inetmovil", "v19e_f"})
+    assert body["matriz_confusion_test"]["tn"] + body["matriz_confusion_test"][
+        "fp"
+    ] + body["matriz_confusion_test"]["fn"] + body["matriz_confusion_test"][
+        "tp"
+    ] == body["particion"]["test"]

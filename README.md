@@ -30,7 +30,9 @@ El notebook usa las funciones estadísticas centrales de `src/mining.py` para la
 
 - Python 3.12
 - Pandas y NumPy
-- SciPy no es necesario en esta versión: V de Cramér e IQR se calculan directamente con NumPy/Pandas para conservar el EDA existente
+- scikit-learn para el pipeline predictivo y las métricas de clasificación
+- statsmodels para la inferencia estadística con `Logit`
+- joblib para guardar el pipeline entrenado de forma reproducible
 - Matplotlib y seaborn para el EDA existente
 - openpyxl para el diccionario censal
 - FastAPI, Pydantic y Uvicorn
@@ -118,6 +120,37 @@ El EDA narrativo y sus nueve gráficos permanecen en `notebooks/EDA_Internet_LaP
 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=600 notebooks/EDA_Internet_LaPaz.ipynb
 ```
 
+## Regresión Logística
+
+La primera iteración estima la probabilidad de acceso a Internet fijo y/o móvil en una vivienda u hogar de La Paz. El target `TIENE_ACCESO_INTERNET` se construye con la variable oficial `v19e_f`: `1` se codifica como acceso y `2` como ausencia de acceso; `9 = Sin especificar` no se convierte en la clase negativa.
+
+Los predictores son `urbrur`, `v01_tipoviv`, `v09_energia`, `v19c_compu`, `v19d_celular`, `v13_habitac` y `tot_pers`. Las variables de Internet fijo, móvil y combinado se excluyen para evitar fuga de información. Las categóricas se imputan y codifican con one-hot encoding; las numéricas se imputan con la mediana.
+
+Entrenar y regenerar los artefactos:
+
+```bash
+python scripts/entrenar_regresion_logistica.py
+```
+
+El comando usa el conjunto completo de registros válidos, divide `80/20` con `random_state=777` y estratificación, entrena `LogisticRegression(max_iter=1000)`, evalúa train/test, ajusta `statsmodels.api.Logit` sobre train y guarda:
+
+- `outputs/modelado/metricas_regresion_logistica.json`;
+- `outputs/modelado/matriz_confusion_test.csv`;
+- `outputs/modelado/coeficientes_logisticos.csv`;
+- `outputs/modelado/predicciones_test.csv.gz`;
+- `outputs/modelado/resumen_statsmodels.txt`;
+- `outputs/modelos/regresion_logistica.joblib`.
+
+El modelo se guarda para permitir inferencia reproducible sin volver a ajustar el preprocesamiento. La API no lo entrena en cada petición: lee el JSON generado previamente.
+
+El análisis narrativo está en `notebooks/Regresion_Logistica_Internet_LaPaz.ipynb`. Para ejecutarlo por completo:
+
+```bash
+jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=900 notebooks/Regresion_Logistica_Internet_LaPaz.ipynb
+```
+
+Los resultados se sirven mediante `GET /api/mineria/regresion-logistica`. La sección **Regresión Logística** del dashboard consume ese endpoint y muestra métricas, matriz de confusión, curva ROC, train frente a test, coeficientes y Odds Ratios sin cifras hardcodeadas.
+
 ## Backend
 
 Iniciar la API:
@@ -152,6 +185,7 @@ Por defecto CORS permite únicamente `http://localhost:5173` y `http://127.0.0.1
 | GET | `/api/conectividad/provincias` | `outputs/tablas/provincias.csv` |
 | GET | `/api/mineria/outliers` | Outliers y límites IQR del JSON procesado |
 | GET | `/api/mineria/distribucion` | Tasas municipales procesadas |
+| GET | `/api/mineria/regresion-logistica` | Resultados de la primera iteración guardados en `outputs/modelado/` |
 | GET | `/api/calidad` | `faltantes.csv` y auditorías del JSON |
 | GET | `/api/metadata` | Diccionario utilizado, fuente y proceso |
 | GET | `/api/hallazgos` | Hallazgo, hipótesis y conclusiones generados por el pipeline |
@@ -197,6 +231,7 @@ La página incluye:
 - territorios atípicos según la regla de Tukey;
 - hallazgo, hipótesis y conclusiones del análisis;
 - filtros por área y métrica;
+- sección de Regresión Logística con métricas, matriz de confusión, curva ROC, Odds Ratios y comparación train/test;
 - estados de carga, error y ausencia de datos;
 - diseño adaptable a escritorio, tableta y móvil.
 
@@ -244,12 +279,18 @@ Mineria-de-Datos-Internet/
 │   └── vite.config.ts
 ├── src/
 │   ├── mining.py
+│   ├── logistic_regression.py
 │   └── pipeline.py
+├── scripts/
+│   └── entrenar_regresion_logistica.py
 ├── notebooks/
-│   └── EDA_Internet_LaPaz.ipynb
+│   ├── EDA_Internet_LaPaz.ipynb
+│   └── Regresion_Logistica_Internet_LaPaz.ipynb
 ├── outputs/
 │   ├── datos/
 │   ├── graficos/
+│   ├── modelado/
+│   ├── modelos/
 │   ├── tablas/
 │   └── resumen_eda.json
 ├── Base de datos CSV/

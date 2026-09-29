@@ -21,6 +21,7 @@ from app.schemas.responses import (
     MetadataResponse,
     Outlier,
     OutliersResponse,
+    RegresionLogisticaResponse,
     ResumenResponse,
     TerritorioConectividad,
     TerritoriosResponse,
@@ -63,6 +64,15 @@ class DataService:
         if not path.is_file():
             raise FileNotFoundError(
                 f"No existe {path}. Ejecute: python -m src.pipeline"
+            )
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    @lru_cache(maxsize=1)
+    def logistic_summary(self) -> dict[str, Any]:
+        path = self.outputs_dir / "modelado" / "metricas_regresion_logistica.json"
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"No existe {path}. Ejecute: python scripts/entrenar_regresion_logistica.py"
             )
         return json.loads(path.read_text(encoding="utf-8"))
 
@@ -306,8 +316,12 @@ class DataService:
             conclusiones_principales=list(summary["conclusiones"]),
         )
 
+    def get_logistic_regression(self) -> RegresionLogisticaResponse:
+        """Expone artefactos ya calculados; nunca entrena desde una petición HTTP."""
+
+        return RegresionLogisticaResponse.model_validate(self.logistic_summary())
+
 
 @lru_cache(maxsize=1)
 def get_data_service() -> DataService:
     return DataService(settings.outputs_dir)
-

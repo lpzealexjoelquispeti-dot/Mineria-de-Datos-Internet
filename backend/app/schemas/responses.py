@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -134,3 +134,19 @@ class HallazgosResponse(BaseModel):
     hipotesis: str
     conclusiones_principales: list[str]
 
+
+class RegresionLogisticaResponse(BaseModel):
+    objetivo: str
+    target: dict[str, Any]
+    variables_utilizadas: list[dict[str, str]]
+    registros: dict[str, Any]
+    distribucion_clases_total: dict[str, Any]
+    particion: dict[str, Any]
+    metricas: dict[str, dict[str, float]]
+    matriz_confusion_test: dict[str, Any]
+    baseline: dict[str, Any]
+    umbral_principal: float
+    roc: dict[str, Any]
+    coeficientes_principales: list[dict[str, Any]]
+    statsmodels: dict[str, Any]
+    interpretacion_primera_iteracion: str
