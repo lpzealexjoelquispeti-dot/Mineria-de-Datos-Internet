@@ -26,6 +26,11 @@ async def test_arbol_regresion_saved_metrics_and_municipal_predictions():
     response = await get("/api/mineria/arbol-regresion")
     assert response.status_code == 200
     body = response.json()
+    assert body["seleccion_features"] == raw["seleccion_features"]
+    assert body["comparacion_features"] == raw["comparacion_features"]
+    assert body["gridsearch"]["configuracion_cv"] == {
+        "tipo": "KFold", "n_splits": 5, "shuffle": True, "random_state": 777}
+    assert body["seleccion_features"]["variables"] == [v["variable"] for v in body["variables_utilizadas"]]
     assert body["metricas"] == raw["metricas"]
     assert body["real_vs_predicho"] == raw["real_vs_predicho"]
     assert body["unidad_analisis"] == "Municipio"

@@ -202,6 +202,27 @@ class RegressionMetricsDifference(BaseModel):
     r2: float
 
 
+class RegressionFeatureSelection(BaseModel):
+    variante: Literal["A", "B"]
+    variables: list[str]
+    criterio: str
+    diferencia_mse_b_menos_a: float
+    empate_equivalente: bool
+    tolerancia_absoluta_pp2: float = Field(ge=0)
+    tolerancia_relativa: float = Field(ge=0)
+    tolerancia_aplicada_pp2: float = Field(ge=0)
+    motivo: str
+
+
+class RegressionFeatureComparison(BaseModel):
+    variante: Literal["A", "B"]
+    variables: list[str]
+    best_mse_cv: float = Field(ge=0)
+    std_mse_cv: float = Field(ge=0)
+    best_params: dict[str, int]
+    seleccionada: bool
+
+
 class ArbolRegresionResponse(BaseModel):
     generado_en: str
     objetivo: str
@@ -209,6 +230,9 @@ class ArbolRegresionResponse(BaseModel):
     referencia_academica: str
     target: dict[str, str]
     variables_utilizadas: list[dict[str, str]]
+    seleccion_features: RegressionFeatureSelection
+    comparacion_features: list[RegressionFeatureComparison]
+    fuentes_censo_sha256: dict[str, Any]
     registros: dict[str, Any]
     particion: dict[str, Any]
     modelo_base: dict[str, Any]

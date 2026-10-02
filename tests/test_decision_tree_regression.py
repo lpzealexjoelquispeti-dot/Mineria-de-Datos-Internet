@@ -5,7 +5,8 @@ import joblib
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.model_selection import ParameterGrid
+from sklearn.model_selection import KFold, ParameterGrid
+from sklearn.tree import export_text
 
 from src import decision_tree_regression as regression
 
@@ -24,18 +25,22 @@ def run(prepared, tmp_path_factory):
     expected = regression.dividir_train_test(prepared.X, prepared.y)
     observed = []
 
-    def train_only(X, y):
-        pd.testing.assert_frame_equal(X, expected[0])
+    def train_only(X, y, cv=None):
+        pd.testing.assert_frame_equal(X, regression.seleccionar_predictores(prepared.dataset.loc[expected[0].index], list(X.columns)))
         pd.testing.assert_series_equal(y, expected[2])
         assert X.index.intersection(expected[1].index).empty
-        observed.append(X.index.tolist())
-        return real_search(X, y)
+        observed.append((X.index.tolist(), cv, list(cv.split(X, y))))
+        return real_search(X, y, cv=cv)
 
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr(regression, "preparar_dataset_modelo", lambda *args: prepared)
         patch.setattr(regression, "buscar_hiperparametros", train_only)
         result = regression.ejecutar_entrenamiento(destination)
-    assert len(observed) == 1
+    assert len(observed) == 2
+    assert observed[0][0] == observed[1][0]
+    assert observed[0][1] is observed[1][1]
+    for (at, av), (bt, bv) in zip(observed[0][2], observed[1][2], strict=True):
+        assert np.array_equal(at, bt) and np.array_equal(av, bv)
     return result, destination
 
 
@@ -139,7 +144,12 @@ def test_full_grid_valid_and_train_only(run):
     assert len(ParameterGrid(grid)) == 608
     runtime = result["_runtime"]
     search = runtime["search"]
-    assert search.cv == 5 and search.n_jobs == -1
+    assert isinstance(search.cv, KFold) and search.n_jobs == -1
+    assert search.cv.n_splits == 5 and search.cv.shuffle is True
+    assert search.cv.random_state == 777
+    assert result["gridsearch"]["configuracion_cv"] == {
+        "tipo": "KFold", "n_splits": 5, "shuffle": True, "random_state": 777}
+    assert result["gridsearch"]["ajustes_cv_totales"] == 6080
     assert search.scoring == "neg_mean_squared_error"
     assert len(search.cv_results_["params"]) == 608
     assert result["gridsearch"]["ajustes_cv"] == 3040
@@ -160,7 +170,7 @@ def test_pipeline_predictions_median_importance_and_serialization(run):
     assert result["suma_importancias"] == pytest.approx(1)
     restored = joblib.load(destination / result["artefactos"]["modelo"])
     assert np.allclose(restored.predict(runtime["X_test"]), predictions)
-    assert set(pipeline.feature_names_in_) == set(regression.MODEL_FEATURES)
+    assert set(pipeline.feature_names_in_) == set(result["seleccion_features"]["variables"])
 
 
 def test_metrics_nonnegative_errors_and_preserve_negative_r2(prepared, run):
@@ -196,7 +206,7 @@ def test_all_artifacts_exist_and_no_individual_microdata(run):
     for path in result["artefactos"].values():
         assert (destination / path).is_file() and (destination / path).stat().st_size > 0
     table = pd.read_csv(destination / result["artefactos"]["dataset"])
-    assert list(table) == ["municipio_codigo", "municipio", *regression.MODEL_FEATURES, regression.TARGET]
+    assert list(table) == ["municipio_codigo", "municipio", *regression.DATASET_FEATURES, regression.TARGET]
     assert len(table) == result["registros"]["municipios"]
 
 
@@ -227,6 +237,8 @@ def test_aggregation_never_uses_internet_to_construct_features():
         changed[variable] = "2"
     second = regression.construir_dataset_municipal(changed, dictionary, reference(changed))
     pd.testing.assert_frame_equal(first.X, second.X)
+    pd.testing.assert_frame_equal(
+        first.dataset[regression.DATASET_FEATURES], second.dataset[regression.DATASET_FEATURES])
     assert second.y.eq(0).all()
     assert first.y.gt(0).any()
 
@@ -260,3 +272,146 @@ def test_aggregation_preserves_missing_equipment_and_numeric_cleaning():
     people = pd.to_numeric(group.tot_pers, errors="coerce")
     assert row.promedio_habitaciones == pytest.approx(rooms.loc[rooms.between(1, 8)].mean())
     assert row.promedio_personas == pytest.approx(people.loc[people.between(0, 9999)].mean())
+
+
+def test_room_percentage_validity_and_open_ended_category(prepared):
+    assert prepared.dataset.pct_3_o_mas_habitaciones.between(0, 100).all()
+    from src.pipeline import VARIABLES, read_dictionary
+    raw = pd.read_csv(ROOT / "outputs/datos/vivienda_lapaz_seleccion.csv.gz", sep=";",
+                      nrows=10000, usecols=VARIABLES, dtype="string", keep_default_na=False)
+    raw = raw.loc[raw.v01_tipoviv.isin(["1", "2", "3", "4", "5", "6"]) & raw.v02_condocup.isin(["0", "1"])].copy()
+    geography = raw.idep + raw.iprov + raw.imun
+    code = geography.value_counts().index[0]
+    raw = raw.loc[geography.eq(code)].iloc[:6].copy()
+    assert len(raw) == 6
+    assert (raw[["idep", "iprov", "imun"]].nunique() == 1).all()
+    dictionary = read_dictionary(ROOT / "Base de datos CSV/Diccionario de variables CPV 2024.xlsx")
+    code = raw.iloc[0].idep.lstrip("0") + raw.iloc[0].iprov + raw.iloc[0].imun
+    eda = pd.DataFrame([{"municipio_codigo": code, "municipio": dictionary["mun_res_cod"]["categorias"][code],
+                         "universo": len(raw), "pct_algun": raw.v19e_f.eq("1").mean() * 100}])
+    raw["v13_habitac"] = ["1", "2", "3", "8", "9", ""]
+    first = regression.construir_dataset_municipal(raw, dictionary, eda)
+    assert first.dataset.pct_3_o_mas_habitaciones.iloc[0] == pytest.approx(50)
+    assert first.audit["conteos_validos_municipales"][0]["validos_pct_3_o_mas_habitaciones"] == 4
+    raw["v13_habitac"] = ["9", "", "0", "99", "-1", "3.5"]
+    second = regression.construir_dataset_municipal(raw, dictionary, eda)
+    assert pd.isna(second.dataset.pct_3_o_mas_habitaciones.iloc[0])
+    assert second.audit["conteos_validos_municipales"][0]["validos_pct_3_o_mas_habitaciones"] == 0
+
+
+def test_selection_uses_cv_only_and_documented_tie():
+    rows = [{"variante": "A", "best_mse_cv": 20, "metricas_test": {"mse": 0}},
+            {"variante": "B", "best_mse_cv": 19, "metricas_test": {"mse": 99999}}]
+    assert regression.seleccionar_variante(rows)["variante"] == "B"
+    rows[0]["metricas_test"], rows[1]["metricas_test"] = rows[1]["metricas_test"], rows[0]["metricas_test"]
+    assert regression.seleccionar_variante(rows)["variante"] == "B"
+    rows[1]["best_mse_cv"] = 20 + 1e-7
+    selection = regression.seleccionar_variante(rows)
+    assert selection["variante"] == "B" and selection["empate_equivalente"]
+    rows[1]["best_mse_cv"] = 21
+    assert regression.seleccionar_variante(rows)["variante"] == "A"
+
+
+def test_selection_precedes_single_final_tree_test_evaluation(monkeypatch, prepared, tmp_path):
+    selected = []
+    evaluated = []
+    actual_select, actual_evaluate = regression.seleccionar_variante, regression.evaluar_modelo
+    test_index = regression.dividir_train_test(prepared.X, prepared.y)[1].index
+
+    def select(rows):
+        assert all("metricas_test" not in row for row in rows)
+        selected.append(True)
+        return actual_select(rows)
+
+    def evaluate(model, X, y):
+        if X.index.equals(test_index):
+            assert selected == [True]
+            if hasattr(model, "named_steps"):
+                evaluated.append(model)
+        return actual_evaluate(model, X, y)
+
+    # Espías vigilan el orden del flujo y una sola evaluación test del árbol.
+    monkeypatch.setattr(regression, "preparar_dataset_modelo", lambda *args: prepared)
+    monkeypatch.setattr(regression, "seleccionar_variante", select)
+    monkeypatch.setattr(regression, "evaluar_modelo", evaluate)
+    regression.ejecutar_entrenamiento(tmp_path, save_outputs=False)
+    assert len(evaluated) == 1
+
+
+def test_sha256_deterministic_changed_content_and_previous_manifest(tmp_path):
+    from src.pipeline import sha256
+    from src.census_sources import verificar_archivos
+    path = tmp_path / "tiny.csv"
+    path.write_bytes(b"col\n1\n")
+    first = verificar_archivos({"tiny.csv": path}, root=tmp_path)
+    assert first["tiny.csv"]["sha256"] == sha256(path) == sha256(path)
+    assert first["tiny.csv"]["bytes"] == 6
+    assert verificar_archivos({"tiny.csv": path}, first, tmp_path) == first
+    path.write_bytes(b"col\n2\n")  # Mismo tamaño, distinto contenido.
+    assert sha256(path) != first["tiny.csv"]["sha256"]
+    with pytest.raises(ValueError, match="manifiesto previo"):
+        verificar_archivos({"tiny.csv": path}, first, tmp_path)
+
+
+def test_source_verifier_checks_eda_and_does_not_overwrite_changed_source(tmp_path):
+    import json
+    from src.census_sources import SOURCE_NAMES, MANIFEST_PATH, verificar_fuentes_censo
+    source = tmp_path / "Base de datos CSV"
+    source.mkdir()
+    for name in SOURCE_NAMES:
+        (source / name).write_bytes(b"small fixture")
+    first = verificar_fuentes_censo(tmp_path)
+    manifest = tmp_path / MANIFEST_PATH
+    original = manifest.read_bytes()
+    assert verificar_fuentes_censo(tmp_path) == first
+    manifest.unlink()
+    (tmp_path / "outputs/resumen_eda.json").write_text(json.dumps({"fuentes": first}))
+    (source / SOURCE_NAMES[0]).write_bytes(b"changed source")
+    with pytest.raises(ValueError, match="resumen_eda"):
+        verificar_fuentes_censo(tmp_path)
+    assert not manifest.exists()
+    manifest.write_bytes(original)
+    with pytest.raises(ValueError, match="fuentes_censo_sha256"):
+        verificar_fuentes_censo(tmp_path)
+    assert manifest.read_bytes() == original
+
+
+def test_exported_rules_match_serialized_final_model_and_features(run):
+    result, destination = run
+    restored = joblib.load(destination / result["artefactos"]["modelo"])
+    model = restored.named_steps["modelo"]
+    features = result["seleccion_features"]["variables"]
+    assert list(restored.feature_names_in_) == features
+    expected = export_text(model, feature_names=features, decimals=6, max_depth=max(1, model.get_depth()))
+    assert (destination / result["artefactos"]["reglas"]).read_text() == expected
+    runtime = result["_runtime"]
+    assert runtime["pipeline"] is runtime["search"].best_estimator_
+    row = runtime["X_test"].iloc[:1]
+    explanation = regression.explicar_prediccion(restored, row)
+    assert explanation["prediccion_final"] == pytest.approx(restored.predict(row)[0])
+    tree = model.tree_
+    node = 0
+    for step in explanation["ruta"]:
+        assert step["nodo"] == node
+        assert step["feature"] == features[tree.feature[node]]
+        assert step["umbral"] == tree.threshold[node]
+        node = tree.children_left[node] if step["condicion"] == "<=" else tree.children_right[node]
+    assert node == explanation["hoja"]
+
+
+def test_saved_cv_comparison_and_fold_tables_match_results(run):
+    import json
+    result, destination = run
+    comparison = pd.read_csv(destination / result["artefactos"]["comparacion_features"])
+    assert comparison.variante.tolist() == ["A", "B"]
+    assert comparison.seleccionada.sum() == 1
+    for row, expected in zip(comparison.to_dict("records"), result["comparacion_features"], strict=True):
+        assert json.loads(row["variables"]) == expected["variables"]
+        assert json.loads(row["best_params"]) == expected["best_params"]
+        assert row["best_mse_cv"] == pytest.approx(expected["best_mse_cv"])
+        assert row["std_mse_cv"] == pytest.approx(expected["std_mse_cv"])
+    folds = pd.read_csv(destination / result["artefactos"]["folds_cv"])
+    assert folds.fold.tolist() == list(range(1, 6))
+    assert np.allclose(folds.mse_validacion, result["gridsearch"]["mse_folds"])
+    grid = pd.read_csv(destination / result["artefactos"]["gridsearch"])
+    assert grid.groupby("variante").size().to_dict() == {"A": 608, "B": 608}

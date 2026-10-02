@@ -1,0 +1,12 @@
+{
+  "Vivienda_CPV-2024.csv": {
+    "ruta": "Base de datos CSV/Vivienda_CPV-2024.csv",
+    "bytes": 490862565,
+    "sha256": "f3cef44bcf103978734e86adf2c8c147a89adcb7146c78f78df7c409107a7aee"
+  },
+  "Diccionario de variables CPV 2024.xlsx": {
+    "ruta": "Base de datos CSV/Diccionario de variables CPV 2024.xlsx",
+    "bytes": 204479,
+    "sha256": "20e1f074145b8277ad18a71bc180a3e2f89f0b38fc9760bf88be0bc766e2db0e"
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "generado_en": "2026-10-02T17:19:32.843422+00:00",
+  "generado_en": "2026-10-02T19:19:05.857373+00:00",
   "objetivo": "Predecir el porcentaje de viviendas con acceso a Internet de cada municipio de La Paz a partir de características censales agregadas.",
   "unidad_analisis": "Municipio",
   "referencia_academica": "https://github.com/ealaurel/MINERIA_DATOS_2026_2/blob/main/h3_3_Arboles_de_decisi%C3%B3n_regresion.ipynb",
@@ -28,8 +28,8 @@
       "descripcion": "Porcentaje con teléfono celular entre respuestas determinadas"
     },
     {
-      "variable": "promedio_habitaciones",
-      "descripcion": "Media del código de habitaciones válido (8 = ocho o más)"
+      "variable": "pct_3_o_mas_habitaciones",
+      "descripcion": "Porcentaje con tres o más habitaciones entre códigos válidos 1–8 (8 = ocho o más)"
     },
     {
       "variable": "promedio_personas",
@@ -54,7 +54,7 @@
       "4"
     ],
     "energia_codigo_ausencia": "5",
-    "denominadores": "Target: todas las viviendas del universo TIC, incluido Internet sin especificar. Porcentajes predictores: respuestas determinadas de cada variable; 9/vacíos no se recodifican como No. Medias: valores válidos según H3_1/H3_2. No se imputa antes de agregar ni antes de separar train/test.",
+    "denominadores": "Target: todas las viviendas del universo TIC, incluido Internet sin especificar. Porcentajes predictores: respuestas determinadas de cada variable; 9/vacíos no se recodifican como No. Medias: valores válidos según H3_1/H3_2. Habitaciones 3+: códigos 3–8 / códigos válidos 1–8 × 100, dentro del universo TIC; 8 es ocho o más. No se imputa antes de agregar ni antes de separar train/test.",
     "conteos_validos_municipales": [
       {
         "municipio_codigo": "20101",
@@ -64,6 +64,7 @@
         "validos_pct_celular": 246906,
         "validos_promedio_habitaciones": 250931,
         "validos_promedio_personas": 250931,
+        "validos_pct_3_o_mas_habitaciones": 250931,
         "municipio": "Nuestra Señora de La Paz",
         "universo": 250931
       },
@@ -75,6 +76,7 @@
         "validos_pct_celular": 7284,
         "validos_promedio_habitaciones": 7585,
         "validos_promedio_personas": 7585,
+        "validos_pct_3_o_mas_habitaciones": 7585,
         "municipio": "Palca",
         "universo": 7585
       },
@@ -86,6 +88,7 @@
         "validos_pct_celular": 6683,
         "validos_promedio_habitaciones": 6849,
         "validos_promedio_personas": 6849,
+        "validos_pct_3_o_mas_habitaciones": 6849,
         "municipio": "Mecapaca",
         "universo": 6849
       },
@@ -97,6 +100,7 @@
         "validos_pct_celular": 15641,
         "validos_promedio_habitaciones": 16297,
         "validos_promedio_personas": 16297,
+        "validos_pct_3_o_mas_habitaciones": 16297,
         "municipio": "Achocalla",
         "universo": 16297
       },
@@ -108,6 +112,7 @@
         "validos_pct_celular": 292195,
         "validos_promedio_habitaciones": 297898,
         "validos_promedio_personas": 297898,
+        "validos_pct_3_o_mas_habitaciones": 297898,
         "municipio": "El Alto",
         "universo": 297898
       },
@@ -119,6 +124,7 @@
         "validos_pct_celular": 17555,
         "validos_promedio_habitaciones": 18316,
         "validos_promedio_personas": 18316,
+        "validos_pct_3_o_mas_habitaciones": 18316,
         "municipio": "Achacachi",
         "universo": 18316
       },
@@ -130,6 +136,7 @@
         "validos_pct_celular": 6450,
         "validos_promedio_habitaciones": 6737,
         "validos_promedio_personas": 6737,
+        "validos_pct_3_o_mas_habitaciones": 6737,
         "municipio": "Villa Ancoraimes",
         "universo": 6737
       },
@@ -141,6 +148,7 @@
         "validos_pct_celular": 3818,
         "validos_promedio_habitaciones": 3956,
         "validos_promedio_personas": 3956,
+        "validos_pct_3_o_mas_habitaciones": 3956,
         "municipio": "Huarina",
         "universo": 3956
       },
@@ -152,6 +160,7 @@
         "validos_pct_celular": 4253,
         "validos_promedio_habitaciones": 4479,
         "validos_promedio_personas": 4479,
+        "validos_pct_3_o_mas_habitaciones": 4479,
         "municipio": "Santiago de Huata",
         "universo": 4479
       },
@@ -163,6 +172,7 @@
         "validos_pct_celular": 2414,
         "validos_promedio_habitaciones": 2509,
         "validos_promedio_personas": 2509,
+        "validos_pct_3_o_mas_habitaciones": 2509,
         "municipio": "Huatajata",
         "universo": 2509
       },
@@ -174,6 +184,7 @@
         "validos_pct_celular": 2536,
         "validos_promedio_habitaciones": 2631,
         "validos_promedio_personas": 2631,
+        "validos_pct_3_o_mas_habitaciones": 2631,
         "municipio": "Chua Cocani",
         "universo": 2631
       },
@@ -185,6 +196,7 @@
         "validos_pct_celular": 4999,
         "validos_promedio_habitaciones": 5244,
         "validos_promedio_personas": 5244,
+        "validos_pct_3_o_mas_habitaciones": 5244,
         "municipio": "Corocoro",
         "universo": 5244
       },
@@ -196,6 +208,7 @@
         "validos_pct_celular": 5013,
         "validos_promedio_habitaciones": 5233,
         "validos_promedio_personas": 5233,
+        "validos_pct_3_o_mas_habitaciones": 5233,
         "municipio": "Caquiaviri",
         "universo": 5233
       },
@@ -207,6 +220,7 @@
         "validos_pct_celular": 4904,
         "validos_promedio_habitaciones": 5108,
         "validos_promedio_personas": 5108,
+        "validos_pct_3_o_mas_habitaciones": 5108,
         "municipio": "Calacoto",
         "universo": 5108
       },
@@ -218,6 +232,7 @@
         "validos_pct_celular": 1875,
         "validos_promedio_habitaciones": 1930,
         "validos_promedio_personas": 1930,
+        "validos_pct_3_o_mas_habitaciones": 1930,
         "municipio": "Comanche",
         "universo": 1930
       },
@@ -229,6 +244,7 @@
         "validos_pct_celular": 1658,
         "validos_promedio_habitaciones": 1742,
         "validos_promedio_personas": 1742,
+        "validos_pct_3_o_mas_habitaciones": 1742,
         "municipio": "Charaña",
         "universo": 1742
       },
@@ -240,6 +256,7 @@
         "validos_pct_celular": 1342,
         "validos_promedio_habitaciones": 1463,
         "validos_promedio_personas": 1463,
+        "validos_pct_3_o_mas_habitaciones": 1463,
         "municipio": "Waldo Ballivián",
         "universo": 1463
       },
@@ -251,6 +268,7 @@
         "validos_pct_celular": 1145,
         "validos_promedio_habitaciones": 1213,
         "validos_promedio_personas": 1213,
+        "validos_pct_3_o_mas_habitaciones": 1213,
         "municipio": "Nazacara de Pacajes",
         "universo": 1213
       },
@@ -262,6 +280,7 @@
         "validos_pct_celular": 3314,
         "validos_promedio_habitaciones": 3569,
         "validos_promedio_personas": 3569,
+        "validos_pct_3_o_mas_habitaciones": 3569,
         "municipio": "Santiago de Callapa",
         "universo": 3569
       },
@@ -273,6 +292,7 @@
         "validos_pct_celular": 6385,
         "validos_promedio_habitaciones": 6604,
         "validos_promedio_personas": 6604,
+        "validos_pct_3_o_mas_habitaciones": 6604,
         "municipio": "Puerto Acosta",
         "universo": 6604
       },
@@ -284,6 +304,7 @@
         "validos_pct_celular": 7578,
         "validos_promedio_habitaciones": 8013,
         "validos_promedio_personas": 8013,
+        "validos_pct_3_o_mas_habitaciones": 8013,
         "municipio": "Mocomoco",
         "universo": 8013
       },
@@ -295,6 +316,7 @@
         "validos_pct_celular": 6791,
         "validos_promedio_habitaciones": 7065,
         "validos_promedio_personas": 7065,
+        "validos_pct_3_o_mas_habitaciones": 7065,
         "municipio": "Puerto Mayor de Carabuco",
         "universo": 7065
       },
@@ -306,6 +328,7 @@
         "validos_pct_celular": 2464,
         "validos_promedio_habitaciones": 2527,
         "validos_promedio_personas": 2527,
+        "validos_pct_3_o_mas_habitaciones": 2527,
         "municipio": "Humanata",
         "universo": 2527
       },
@@ -317,6 +340,7 @@
         "validos_pct_celular": 3975,
         "validos_promedio_habitaciones": 4116,
         "validos_promedio_personas": 4116,
+        "validos_pct_3_o_mas_habitaciones": 4116,
         "municipio": "Escoma",
         "universo": 4116
       },
@@ -328,6 +352,7 @@
         "validos_pct_celular": 6060,
         "validos_promedio_habitaciones": 6388,
         "validos_promedio_personas": 6388,
+        "validos_pct_3_o_mas_habitaciones": 6388,
         "municipio": "Chuma",
         "universo": 6388
       },
@@ -339,6 +364,7 @@
         "validos_pct_celular": 3249,
         "validos_promedio_habitaciones": 3494,
         "validos_promedio_personas": 3494,
+        "validos_pct_3_o_mas_habitaciones": 3494,
         "municipio": "Ayata",
         "universo": 3494
       },
@@ -350,6 +376,7 @@
         "validos_pct_celular": 2376,
         "validos_promedio_habitaciones": 2500,
         "validos_promedio_personas": 2500,
+        "validos_pct_3_o_mas_habitaciones": 2500,
         "municipio": "Aucapata",
         "universo": 2500
       },
@@ -361,6 +388,7 @@
         "validos_pct_celular": 10938,
         "validos_promedio_habitaciones": 11459,
         "validos_promedio_personas": 11459,
+        "validos_pct_3_o_mas_habitaciones": 11459,
         "municipio": "Sorata",
         "universo": 11459
       },
@@ -372,6 +400,7 @@
         "validos_pct_celular": 6007,
         "validos_promedio_habitaciones": 6269,
         "validos_promedio_personas": 6269,
+        "validos_pct_3_o_mas_habitaciones": 6269,
         "municipio": "Guanay",
         "universo": 6269
       },
@@ -383,6 +412,7 @@
         "validos_pct_celular": 3984,
         "validos_promedio_habitaciones": 4152,
         "validos_promedio_personas": 4152,
+        "validos_pct_3_o_mas_habitaciones": 4152,
         "municipio": "Tacacoma",
         "universo": 4152
       },
@@ -394,6 +424,7 @@
         "validos_pct_celular": 1321,
         "validos_promedio_habitaciones": 1391,
         "validos_promedio_personas": 1391,
+        "validos_pct_3_o_mas_habitaciones": 1391,
         "municipio": "Quiabaya",
         "universo": 1391
       },
@@ -405,6 +436,7 @@
         "validos_pct_celular": 1337,
         "validos_promedio_habitaciones": 1425,
         "validos_promedio_personas": 1425,
+        "validos_pct_3_o_mas_habitaciones": 1425,
         "municipio": "Combaya",
         "universo": 1425
       },
@@ -416,6 +448,7 @@
         "validos_pct_celular": 3156,
         "validos_promedio_habitaciones": 3243,
         "validos_promedio_personas": 3243,
+        "validos_pct_3_o_mas_habitaciones": 3243,
         "municipio": "Tipuani",
         "universo": 3243
       },
@@ -427,6 +460,7 @@
         "validos_pct_celular": 6602,
         "validos_promedio_habitaciones": 6898,
         "validos_promedio_personas": 6898,
+        "validos_pct_3_o_mas_habitaciones": 6898,
         "municipio": "Mapiri",
         "universo": 6898
       },
@@ -438,6 +472,7 @@
         "validos_pct_celular": 4430,
         "validos_promedio_habitaciones": 4602,
         "validos_promedio_personas": 4602,
+        "validos_pct_3_o_mas_habitaciones": 4602,
         "municipio": "Teoponte",
         "universo": 4602
       },
@@ -449,6 +484,7 @@
         "validos_pct_celular": 5886,
         "validos_promedio_habitaciones": 6164,
         "validos_promedio_personas": 6164,
+        "validos_pct_3_o_mas_habitaciones": 6164,
         "municipio": "Apolo",
         "universo": 6164
       },
@@ -460,6 +496,7 @@
         "validos_pct_celular": 2914,
         "validos_promedio_habitaciones": 3068,
         "validos_promedio_personas": 3068,
+        "validos_pct_3_o_mas_habitaciones": 3068,
         "municipio": "Pelechuco",
         "universo": 3068
       },
@@ -471,6 +508,7 @@
         "validos_pct_celular": 40639,
         "validos_promedio_habitaciones": 41941,
         "validos_promedio_personas": 41941,
+        "validos_pct_3_o_mas_habitaciones": 41941,
         "municipio": "Viacha",
         "universo": 41941
       },
@@ -482,6 +520,7 @@
         "validos_pct_celular": 3129,
         "validos_promedio_habitaciones": 3220,
         "validos_promedio_personas": 3220,
+        "validos_pct_3_o_mas_habitaciones": 3220,
         "municipio": "Puerto Mayor de Guaqui",
         "universo": 3220
       },
@@ -493,6 +532,7 @@
         "validos_pct_celular": 4467,
         "validos_promedio_habitaciones": 4653,
         "validos_promedio_personas": 4653,
+        "validos_pct_3_o_mas_habitaciones": 4653,
         "municipio": "Tiahuanacu",
         "universo": 4653
       },
@@ -504,6 +544,7 @@
         "validos_pct_celular": 2592,
         "validos_promedio_habitaciones": 2675,
         "validos_promedio_personas": 2675,
+        "validos_pct_3_o_mas_habitaciones": 2675,
         "municipio": "Desaguadero",
         "universo": 2675
       },
@@ -515,6 +556,7 @@
         "validos_pct_celular": 2987,
         "validos_promedio_habitaciones": 3114,
         "validos_promedio_personas": 3114,
+        "validos_pct_3_o_mas_habitaciones": 3114,
         "municipio": "La (Marka) San Andrés de Machaca",
         "universo": 3114
       },
@@ -526,6 +568,7 @@
         "validos_pct_celular": 5617,
         "validos_promedio_habitaciones": 5887,
         "validos_promedio_personas": 5887,
+        "validos_pct_3_o_mas_habitaciones": 5887,
         "municipio": "Jesús de Machaka",
         "universo": 5887
       },
@@ -537,6 +580,7 @@
         "validos_pct_celular": 2458,
         "validos_promedio_habitaciones": 2562,
         "validos_promedio_personas": 2562,
+        "validos_pct_3_o_mas_habitaciones": 2562,
         "municipio": "Taraco",
         "universo": 2562
       },
@@ -548,6 +592,7 @@
         "validos_pct_celular": 4289,
         "validos_promedio_habitaciones": 4434,
         "validos_promedio_personas": 4434,
+        "validos_pct_3_o_mas_habitaciones": 4434,
         "municipio": "Luribay",
         "universo": 4434
       },
@@ -559,6 +604,7 @@
         "validos_pct_celular": 6445,
         "validos_promedio_habitaciones": 6638,
         "validos_promedio_personas": 6638,
+        "validos_pct_3_o_mas_habitaciones": 6638,
         "municipio": "Sapahaqui",
         "universo": 6638
       },
@@ -570,6 +616,7 @@
         "validos_pct_celular": 3891,
         "validos_promedio_habitaciones": 4142,
         "validos_promedio_personas": 4142,
+        "validos_pct_3_o_mas_habitaciones": 4142,
         "municipio": "Yaco",
         "universo": 4142
       },
@@ -581,6 +628,7 @@
         "validos_pct_celular": 1704,
         "validos_promedio_habitaciones": 1777,
         "validos_promedio_personas": 1777,
+        "validos_pct_3_o_mas_habitaciones": 1777,
         "municipio": "Malla",
         "universo": 1777
       },
@@ -592,6 +640,7 @@
         "validos_pct_celular": 4706,
         "validos_promedio_habitaciones": 4892,
         "validos_promedio_personas": 4892,
+        "validos_pct_3_o_mas_habitaciones": 4892,
         "municipio": "Cairoma",
         "universo": 4892
       },
@@ -603,6 +652,7 @@
         "validos_pct_celular": 6842,
         "validos_promedio_habitaciones": 7144,
         "validos_promedio_personas": 7144,
+        "validos_pct_3_o_mas_habitaciones": 7144,
         "municipio": "Inquisivi",
         "universo": 7144
       },
@@ -614,6 +664,7 @@
         "validos_pct_celular": 4265,
         "validos_promedio_habitaciones": 4434,
         "validos_promedio_personas": 4434,
+        "validos_pct_3_o_mas_habitaciones": 4434,
         "municipio": "Quime",
         "universo": 4434
       },
@@ -625,6 +676,7 @@
         "validos_pct_celular": 5530,
         "validos_promedio_habitaciones": 5809,
         "validos_promedio_personas": 5809,
+        "validos_pct_3_o_mas_habitaciones": 5809,
         "municipio": "Cajuata",
         "universo": 5809
       },
@@ -636,6 +688,7 @@
         "validos_pct_celular": 7487,
         "validos_promedio_habitaciones": 7870,
         "validos_promedio_personas": 7870,
+        "validos_pct_3_o_mas_habitaciones": 7870,
         "municipio": "Colquiri",
         "universo": 7870
       },
@@ -647,6 +700,7 @@
         "validos_pct_celular": 3348,
         "validos_promedio_habitaciones": 3455,
         "validos_promedio_personas": 3455,
+        "validos_pct_3_o_mas_habitaciones": 3455,
         "municipio": "Ichoca",
         "universo": 3455
       },
@@ -658,6 +712,7 @@
         "validos_pct_celular": 1758,
         "validos_promedio_habitaciones": 1871,
         "validos_promedio_personas": 1871,
+        "validos_pct_3_o_mas_habitaciones": 1871,
         "municipio": "Villa Libertad Licoma",
         "universo": 1871
       },
@@ -669,6 +724,7 @@
         "validos_pct_celular": 6999,
         "validos_promedio_habitaciones": 7214,
         "validos_promedio_personas": 7214,
+        "validos_pct_3_o_mas_habitaciones": 7214,
         "municipio": "Chulumani",
         "universo": 7214
       },
@@ -680,6 +736,7 @@
         "validos_pct_celular": 9125,
         "validos_promedio_habitaciones": 9458,
         "validos_promedio_personas": 9458,
+        "validos_pct_3_o_mas_habitaciones": 9458,
         "municipio": "Irupana",
         "universo": 9458
       },
@@ -691,6 +748,7 @@
         "validos_pct_celular": 2905,
         "validos_promedio_habitaciones": 2998,
         "validos_promedio_personas": 2998,
+        "validos_pct_3_o_mas_habitaciones": 2998,
         "municipio": "Yanacachi",
         "universo": 2998
       },
@@ -702,6 +760,7 @@
         "validos_pct_celular": 11250,
         "validos_promedio_habitaciones": 11630,
         "validos_promedio_personas": 11630,
+        "validos_pct_3_o_mas_habitaciones": 11630,
         "municipio": "Palos Blancos",
         "universo": 11630
       },
@@ -713,6 +772,7 @@
         "validos_pct_celular": 17805,
         "validos_promedio_habitaciones": 18380,
         "validos_promedio_personas": 18380,
+        "validos_pct_3_o_mas_habitaciones": 18380,
         "municipio": "La Asunta",
         "universo": 18380
       },
@@ -724,6 +784,7 @@
         "validos_pct_celular": 20565,
         "validos_promedio_habitaciones": 21459,
         "validos_promedio_personas": 21459,
+        "validos_pct_3_o_mas_habitaciones": 21459,
         "municipio": "Pucarani",
         "universo": 21459
       },
@@ -735,6 +796,7 @@
         "validos_pct_celular": 13110,
         "validos_promedio_habitaciones": 13613,
         "validos_promedio_personas": 13613,
+        "validos_pct_3_o_mas_habitaciones": 13613,
         "municipio": "Laja",
         "universo": 13613
       },
@@ -746,6 +808,7 @@
         "validos_pct_celular": 8151,
         "validos_promedio_habitaciones": 8503,
         "validos_promedio_personas": 8503,
+        "validos_pct_3_o_mas_habitaciones": 8503,
         "municipio": "Batallas",
         "universo": 8503
       },
@@ -757,6 +820,7 @@
         "validos_pct_celular": 3033,
         "validos_promedio_habitaciones": 3188,
         "validos_promedio_personas": 3188,
+        "validos_pct_3_o_mas_habitaciones": 3188,
         "municipio": "Puerto Pérez",
         "universo": 3188
       },
@@ -768,6 +832,7 @@
         "validos_pct_celular": 11969,
         "validos_promedio_habitaciones": 12627,
         "validos_promedio_personas": 12627,
+        "validos_pct_3_o_mas_habitaciones": 12627,
         "municipio": "Sicasica",
         "universo": 12627
       },
@@ -779,6 +844,7 @@
         "validos_pct_celular": 3679,
         "validos_promedio_habitaciones": 3921,
         "validos_promedio_personas": 3921,
+        "validos_pct_3_o_mas_habitaciones": 3921,
         "municipio": "Umala",
         "universo": 3921
       },
@@ -790,6 +856,7 @@
         "validos_pct_celular": 4628,
         "validos_promedio_habitaciones": 4794,
         "validos_promedio_personas": 4794,
+        "validos_pct_3_o_mas_habitaciones": 4794,
         "municipio": "Ayo Ayo",
         "universo": 4794
       },
@@ -801,6 +868,7 @@
         "validos_pct_celular": 5232,
         "validos_promedio_habitaciones": 5467,
         "validos_promedio_personas": 5467,
+        "validos_pct_3_o_mas_habitaciones": 5467,
         "municipio": "Calamarca",
         "universo": 5467
       },
@@ -812,6 +880,7 @@
         "validos_pct_celular": 9022,
         "validos_promedio_habitaciones": 9347,
         "validos_promedio_personas": 9347,
+        "validos_pct_3_o_mas_habitaciones": 9347,
         "municipio": "Patacamaya",
         "universo": 9347
       },
@@ -823,6 +892,7 @@
         "validos_pct_celular": 4296,
         "validos_promedio_habitaciones": 4480,
         "validos_promedio_personas": 4480,
+        "validos_pct_3_o_mas_habitaciones": 4480,
         "municipio": "Colquencha",
         "universo": 4480
       },
@@ -834,6 +904,7 @@
         "validos_pct_celular": 1562,
         "validos_promedio_habitaciones": 1653,
         "validos_promedio_personas": 1653,
+        "validos_pct_3_o_mas_habitaciones": 1653,
         "municipio": "Collana",
         "universo": 1653
       },
@@ -845,6 +916,7 @@
         "validos_pct_celular": 10027,
         "validos_promedio_habitaciones": 10376,
         "validos_promedio_personas": 10376,
+        "validos_pct_3_o_mas_habitaciones": 10376,
         "municipio": "Coroico",
         "universo": 10376
       },
@@ -856,6 +928,7 @@
         "validos_pct_celular": 8605,
         "validos_promedio_habitaciones": 8913,
         "validos_promedio_personas": 8913,
+        "validos_pct_3_o_mas_habitaciones": 8913,
         "municipio": "Coripata",
         "universo": 8913
       },
@@ -867,6 +940,7 @@
         "validos_pct_celular": 3073,
         "validos_promedio_habitaciones": 3306,
         "validos_promedio_personas": 3306,
+        "validos_pct_3_o_mas_habitaciones": 3306,
         "municipio": "Ixiamas",
         "universo": 3306
       },
@@ -878,6 +952,7 @@
         "validos_pct_celular": 2720,
         "validos_promedio_habitaciones": 2849,
         "validos_promedio_personas": 2849,
+        "validos_pct_3_o_mas_habitaciones": 2849,
         "municipio": "San Buenaventura",
         "universo": 2849
       },
@@ -889,6 +964,7 @@
         "validos_pct_celular": 4791,
         "validos_promedio_habitaciones": 5022,
         "validos_promedio_personas": 5022,
+        "validos_pct_3_o_mas_habitaciones": 5022,
         "municipio": "Charazani",
         "universo": 5022
       },
@@ -900,6 +976,7 @@
         "validos_pct_celular": 1562,
         "validos_promedio_habitaciones": 1656,
         "validos_promedio_personas": 1656,
+        "validos_pct_3_o_mas_habitaciones": 1656,
         "municipio": "Curva",
         "universo": 1656
       },
@@ -911,6 +988,7 @@
         "validos_pct_celular": 6564,
         "validos_promedio_habitaciones": 6817,
         "validos_promedio_personas": 6817,
+        "validos_pct_3_o_mas_habitaciones": 6817,
         "municipio": "Copacabana",
         "universo": 6817
       },
@@ -922,6 +1000,7 @@
         "validos_pct_celular": 3513,
         "validos_promedio_habitaciones": 3631,
         "validos_promedio_personas": 3631,
+        "validos_pct_3_o_mas_habitaciones": 3631,
         "municipio": "San Pedro de Tiquina",
         "universo": 3631
       },
@@ -933,6 +1012,7 @@
         "validos_pct_celular": 1407,
         "validos_promedio_habitaciones": 1474,
         "validos_promedio_personas": 1474,
+        "validos_pct_3_o_mas_habitaciones": 1474,
         "municipio": "Tito Yupanqui",
         "universo": 1474
       },
@@ -944,6 +1024,7 @@
         "validos_pct_celular": 3276,
         "validos_promedio_habitaciones": 3484,
         "validos_promedio_personas": 3484,
+        "validos_pct_3_o_mas_habitaciones": 3484,
         "municipio": "San Pedro de Curahuara",
         "universo": 3484
       },
@@ -955,6 +1036,7 @@
         "validos_pct_celular": 2764,
         "validos_promedio_habitaciones": 2888,
         "validos_promedio_personas": 2888,
+        "validos_pct_3_o_mas_habitaciones": 2888,
         "municipio": "Papel Pampa",
         "universo": 2888
       },
@@ -966,6 +1048,7 @@
         "validos_pct_celular": 858,
         "validos_promedio_habitaciones": 881,
         "validos_promedio_personas": 881,
+        "validos_pct_3_o_mas_habitaciones": 881,
         "municipio": "Chacarilla",
         "universo": 881
       },
@@ -977,6 +1060,7 @@
         "validos_pct_celular": 2851,
         "validos_promedio_habitaciones": 2956,
         "validos_promedio_personas": 2956,
+        "validos_pct_3_o_mas_habitaciones": 2956,
         "municipio": "Santiago de Machaca",
         "universo": 2956
       },
@@ -988,6 +1072,7 @@
         "validos_pct_celular": 1632,
         "validos_promedio_habitaciones": 1695,
         "validos_promedio_personas": 1695,
+        "validos_pct_3_o_mas_habitaciones": 1695,
         "municipio": "Catacora",
         "universo": 1695
       },
@@ -999,6 +1084,7 @@
         "validos_pct_celular": 20346,
         "validos_promedio_habitaciones": 21081,
         "validos_promedio_personas": 21081,
+        "validos_pct_3_o_mas_habitaciones": 21081,
         "municipio": "Caranavi",
         "universo": 21081
       },
@@ -1010,6 +1096,7 @@
         "validos_pct_celular": 4401,
         "validos_promedio_habitaciones": 4491,
         "validos_promedio_personas": 4491,
+        "validos_pct_3_o_mas_habitaciones": 4491,
         "municipio": "Alto Beni",
         "universo": 4491
       }
@@ -1020,7 +1107,8 @@
       "pct_computadora": 0,
       "pct_celular": 0,
       "promedio_habitaciones": 0,
-      "promedio_personas": 0
+      "promedio_personas": 0,
+      "pct_3_o_mas_habitaciones": 0
     },
     "estadisticos_target": {
       "minimo": 24.32741843159702,
@@ -1028,8 +1116,90 @@
       "promedio": 49.386906922392015,
       "mediana": 48.2275350370981
     },
+    "fuentes_verificadas": {
+      "Vivienda_CPV-2024.csv": {
+        "ruta": "Base de datos CSV/Vivienda_CPV-2024.csv",
+        "bytes": 490862565,
+        "sha256": "f3cef44bcf103978734e86adf2c8c147a89adcb7146c78f78df7c409107a7aee"
+      },
+      "Diccionario de variables CPV 2024.xlsx": {
+        "ruta": "Base de datos CSV/Diccionario de variables CPV 2024.xlsx",
+        "bytes": 204479,
+        "sha256": "20e1f074145b8277ad18a71bc180a3e2f89f0b38fc9760bf88be0bc766e2db0e"
+      }
+    },
     "registros_nacionales": 4490488,
     "fuente_datos": "outputs/datos/vivienda_lapaz_seleccion.csv.gz"
+  },
+  "seleccion_features": {
+    "variante": "B",
+    "variables": [
+      "pct_urbano",
+      "pct_con_energia",
+      "pct_computadora",
+      "pct_celular",
+      "pct_3_o_mas_habitaciones",
+      "promedio_personas"
+    ],
+    "criterio": "seleccion_dinamica_por_cv_train",
+    "diferencia_mse_b_menos_a": -0.8232185207605838,
+    "empate_equivalente": false,
+    "tolerancia_absoluta_pp2": 1e-08,
+    "tolerancia_relativa": 1e-06,
+    "tolerancia_aplicada_pp2": 3.2315246105685376e-05,
+    "motivo": "Variante B tiene menor MSE medio de validación cruzada sobre train."
+  },
+  "comparacion_features": [
+    {
+      "variante": "A",
+      "variables": [
+        "pct_urbano",
+        "pct_con_energia",
+        "pct_computadora",
+        "pct_celular",
+        "promedio_habitaciones",
+        "promedio_personas"
+      ],
+      "best_mse_cv": 33.12846462644596,
+      "std_mse_cv": 10.453981312607002,
+      "best_params": {
+        "max_depth": 7,
+        "min_samples_leaf": 1,
+        "min_samples_split": 8
+      },
+      "seleccionada": false
+    },
+    {
+      "variante": "B",
+      "variables": [
+        "pct_urbano",
+        "pct_con_energia",
+        "pct_computadora",
+        "pct_celular",
+        "pct_3_o_mas_habitaciones",
+        "promedio_personas"
+      ],
+      "best_mse_cv": 32.30524610568538,
+      "std_mse_cv": 11.463718427922943,
+      "best_params": {
+        "max_depth": 7,
+        "min_samples_leaf": 1,
+        "min_samples_split": 8
+      },
+      "seleccionada": true
+    }
+  ],
+  "fuentes_censo_sha256": {
+    "Vivienda_CPV-2024.csv": {
+      "ruta": "Base de datos CSV/Vivienda_CPV-2024.csv",
+      "bytes": 490862565,
+      "sha256": "f3cef44bcf103978734e86adf2c8c147a89adcb7146c78f78df7c409107a7aee"
+    },
+    "Diccionario de variables CPV 2024.xlsx": {
+      "ruta": "Base de datos CSV/Diccionario de variables CPV 2024.xlsx",
+      "bytes": 204479,
+      "sha256": "20e1f074145b8277ad18a71bc180a3e2f89f0b38fc9760bf88be0bc766e2db0e"
+    }
   },
   "particion": {
     "train": 69,
@@ -1492,31 +1662,40 @@
   },
   "gridsearch": {
     "cv": 5,
+    "configuracion_cv": {
+      "tipo": "KFold",
+      "n_splits": 5,
+      "shuffle": true,
+      "random_state": 777
+    },
     "scoring": "neg_mean_squared_error",
     "n_jobs": -1,
     "best_params_": {
-      "modelo__max_depth": 3,
-      "modelo__min_samples_leaf": 3,
-      "modelo__min_samples_split": 2
+      "modelo__max_depth": 7,
+      "modelo__min_samples_leaf": 1,
+      "modelo__min_samples_split": 8
     },
     "mejores_parametros": {
-      "max_depth": 3,
-      "min_samples_leaf": 3,
-      "min_samples_split": 2
+      "max_depth": 7,
+      "min_samples_leaf": 1,
+      "min_samples_split": 8
     },
-    "best_score_": -43.93460376405849,
-    "mejor_mse_cv": 43.93460376405849,
-    "std_mse_cv": 27.44062917405855,
+    "best_score_": -32.30524610568538,
+    "mejor_mse_cv": 32.30524610568538,
+    "std_mse_cv": 11.463718427922943,
     "mse_folds": [
-      73.81642064650835,
-      25.43432927309496,
-      80.78509697204068,
-      17.740842934259472,
-      21.89632899438901
+      38.55210164688482,
+      21.960429658656498,
+      48.94586143883889,
+      34.8508514876188,
+      17.21698629642789
     ],
     "combinaciones_evaluadas": 608,
     "ajustes_cv": 3040,
     "reajustes_finales": 1,
+    "combinaciones_totales_variantes": 1216,
+    "ajustes_cv_totales": 6080,
+    "reajustes_totales_variantes": 2,
     "valores_evaluados": {
       "modelo__max_depth": [
         1,
@@ -1556,20 +1735,20 @@
         4
       ]
     },
-    "estrategia": "Producto cartesiano completo; KFold=5 sin shuffle; imputación dentro de cada fold; solo train."
+    "estrategia": "Producto cartesiano completo por variante; KFold=5 shuffle=True, random_state=777 compartido; imputación dentro de cada fold; solo train."
   },
   "metricas": {
     "train": {
-      "mse": 18.89855299956609,
-      "rmse": 4.347246599810745,
-      "mae": 3.474540062524536,
-      "r2": 0.8753566336821393
+      "mse": 5.894160980934927,
+      "rmse": 2.4277893197176166,
+      "mae": 1.9042413761605326,
+      "r2": 0.9611256974912322
     },
     "test": {
-      "mse": 28.011985064894063,
-      "rmse": 5.292634983152915,
-      "mae": 4.563589931600459,
-      "r2": 0.6573648232828357
+      "mse": 44.11349696528238,
+      "rmse": 6.6417992265110195,
+      "mae": 5.047917838441661,
+      "r2": 0.4604153974344988
     }
   },
   "unidades_metricas": {
@@ -1599,83 +1778,107 @@
     },
     {
       "modelo": "DecisionTreeRegressor",
-      "mse": 28.011985064894063,
-      "rmse": 5.292634983152915,
-      "mae": 4.563589931600459,
-      "r2": 0.6573648232828357
+      "mse": 44.11349696528238,
+      "rmse": 6.6417992265110195,
+      "mae": 5.047917838441661,
+      "r2": 0.4604153974344988
     }
   ],
   "diferencia_arbol_menos_baseline": {
-    "mse": -85.18508023004455,
-    "rmse": -5.346775963649479,
-    "mae": -4.335305863998375,
-    "r2": 1.0419613230076352
+    "mse": -69.08356832965623,
+    "rmse": -3.997611720291375,
+    "mae": -3.8509779571571734,
+    "r2": 0.8450118971592983
   },
   "importancia_variables": [
     {
       "variable": "pct_celular",
-      "importancia": 0.8692453740769455
-    },
-    {
-      "variable": "pct_con_energia",
-      "importancia": 0.13075462592305442
+      "importancia": 0.816376344818981
     },
     {
       "variable": "pct_urbano",
-      "importancia": 0.0
+      "importancia": 0.11590039509783844
     },
     {
       "variable": "pct_computadora",
-      "importancia": 0.0
+      "importancia": 0.03411113265037999
     },
     {
-      "variable": "promedio_habitaciones",
-      "importancia": 0.0
+      "variable": "pct_con_energia",
+      "importancia": 0.018939579149610083
+    },
+    {
+      "variable": "pct_3_o_mas_habitaciones",
+      "importancia": 0.01200651951315113
     },
     {
       "variable": "promedio_personas",
-      "importancia": 0.0
+      "importancia": 0.0026660287700392095
     }
   ],
   "suma_importancias": 0.9999999999999999,
   "estructura_arbol": {
-    "profundidad": 3,
-    "nodos": 13,
-    "hojas": 7,
+    "profundidad": 7,
+    "nodos": 39,
+    "hojas": 20,
     "visualizacion_max_depth": 3
   },
   "real_vs_predicho": [
     {
-      "municipio_codigo": "21006",
-      "municipio": "Villa Libertad Licoma",
-      "valor_real": 51.042223409941215,
-      "valor_predicho": 39.96517974860164,
-      "error": 11.077043661339573,
-      "error_absoluto": 11.077043661339573
-    },
-    {
-      "municipio_codigo": "20608",
-      "municipio": "Teoponte",
-      "valor_real": 58.691873098652756,
-      "valor_predicho": 48.60134568980704,
-      "error": 10.090527408845716,
-      "error_absoluto": 10.090527408845716
-    },
-    {
-      "municipio_codigo": "20805",
-      "municipio": "La (Marka) San Andrés de Machaca",
-      "valor_real": 42.03596660244059,
-      "valor_predicho": 48.60134568980704,
-      "error": -6.565379087366452,
-      "error_absoluto": 6.565379087366452
+      "municipio_codigo": "20104",
+      "municipio": "Achocalla",
+      "valor_real": 68.85929925753206,
+      "valor_predicho": 86.97776035829438,
+      "error": -18.118461100762318,
+      "error_absoluto": 18.118461100762318
     },
     {
       "municipio_codigo": "21602",
       "municipio": "Curva",
       "valor_real": 33.9975845410628,
-      "valor_predicho": 39.96517974860164,
-      "error": -5.967595207538842,
-      "error_absoluto": 5.967595207538842
+      "valor_predicho": 42.55966223261794,
+      "error": -8.562077691555139,
+      "error_absoluto": 8.562077691555139
+    },
+    {
+      "municipio_codigo": "20608",
+      "municipio": "Teoponte",
+      "valor_real": 58.691873098652756,
+      "valor_predicho": 50.18699331268524,
+      "error": 8.504879785967518,
+      "error_absoluto": 8.504879785967518
+    },
+    {
+      "municipio_codigo": "21006",
+      "municipio": "Villa Libertad Licoma",
+      "valor_real": 51.042223409941215,
+      "valor_predicho": 42.55966223261794,
+      "error": 8.482561177323277,
+      "error_absoluto": 8.482561177323277
+    },
+    {
+      "municipio_codigo": "21204",
+      "municipio": "Puerto Pérez",
+      "valor_real": 35.006273525721454,
+      "valor_predicho": 42.55966223261794,
+      "error": -7.5533887068964845,
+      "error_absoluto": 7.5533887068964845
+    },
+    {
+      "municipio_codigo": "21601",
+      "municipio": "Charazani",
+      "valor_real": 35.603345280764636,
+      "valor_predicho": 42.55966223261794,
+      "error": -6.956316951853303,
+      "error_absoluto": 6.956316951853303
+    },
+    {
+      "municipio_codigo": "20503",
+      "municipio": "Aucapata",
+      "valor_real": 38.080000000000005,
+      "valor_predicho": 44.67764526857146,
+      "error": -6.597645268571455,
+      "error_absoluto": 6.597645268571455
     },
     {
       "municipio_codigo": "20905",
@@ -1694,60 +1897,12 @@
       "error_absoluto": 5.8294539628762365
     },
     {
-      "municipio_codigo": "21204",
-      "municipio": "Puerto Pérez",
-      "valor_real": 35.006273525721454,
-      "valor_predicho": 39.96517974860164,
-      "error": -4.958906222880188,
-      "error_absoluto": 4.958906222880188
-    },
-    {
-      "municipio_codigo": "20604",
-      "municipio": "Quiabaya",
-      "valor_real": 35.37023723939612,
-      "valor_predicho": 39.96517974860164,
-      "error": -4.594942509205524,
-      "error_absoluto": 4.594942509205524
-    },
-    {
-      "municipio_codigo": "21501",
-      "municipio": "Ixiamas",
-      "valor_real": 44.37386569872958,
-      "valor_predicho": 39.96517974860164,
-      "error": 4.408685950127939,
-      "error_absoluto": 4.408685950127939
-    },
-    {
-      "municipio_codigo": "21601",
-      "municipio": "Charazani",
-      "valor_real": 35.603345280764636,
-      "valor_predicho": 39.96517974860164,
-      "error": -4.3618344678370065,
-      "error_absoluto": 4.3618344678370065
-    },
-    {
-      "municipio_codigo": "20301",
-      "municipio": "Corocoro",
-      "valor_real": 43.34477498093059,
-      "valor_predicho": 39.96517974860164,
-      "error": 3.3795952323289455,
-      "error_absoluto": 3.3795952323289455
-    },
-    {
-      "municipio_codigo": "20401",
-      "municipio": "Puerto Acosta",
-      "valor_real": 36.644457904300424,
-      "valor_predicho": 39.96517974860164,
-      "error": -3.320721844301218,
-      "error_absoluto": 3.320721844301218
-    },
-    {
-      "municipio_codigo": "20104",
-      "municipio": "Achocalla",
-      "valor_real": 68.85929925753206,
-      "valor_predicho": 66.09445228297704,
-      "error": 2.764846974555013,
-      "error_absoluto": 2.764846974555013
+      "municipio_codigo": "21005",
+      "municipio": "Ichoca",
+      "valor_real": 39.507959479015916,
+      "valor_predicho": 36.00683076109095,
+      "error": 3.5011287179249635,
+      "error_absoluto": 3.5011287179249635
     },
     {
       "municipio_codigo": "20601",
@@ -1758,20 +1913,12 @@
       "error_absoluto": 2.4067429791342576
     },
     {
-      "municipio_codigo": "21304",
-      "municipio": "Calamarca",
-      "valor_real": 46.22279129321383,
-      "valor_predicho": 48.60134568980704,
-      "error": -2.378554396593209,
-      "error_absoluto": 2.378554396593209
-    },
-    {
-      "municipio_codigo": "20503",
-      "municipio": "Aucapata",
-      "valor_real": 38.080000000000005,
-      "valor_predicho": 39.96517974860164,
-      "error": -1.8851797486016366,
-      "error_absoluto": 1.8851797486016366
+      "municipio_codigo": "20805",
+      "municipio": "La (Marka) San Andrés de Machaca",
+      "valor_real": 42.03596660244059,
+      "valor_predicho": 40.12380416432189,
+      "error": 1.912162438118699,
+      "error_absoluto": 1.912162438118699
     },
     {
       "municipio_codigo": "20102",
@@ -1782,69 +1929,102 @@
       "error_absoluto": 1.861260915109952
     },
     {
-      "municipio_codigo": "21005",
-      "municipio": "Ichoca",
-      "valor_real": 39.507959479015916,
-      "valor_predicho": 39.96517974860164,
-      "error": -0.4572202695857257,
-      "error_absoluto": 0.4572202695857257
+      "municipio_codigo": "21501",
+      "municipio": "Ixiamas",
+      "valor_real": 44.37386569872958,
+      "valor_predicho": 42.55966223261794,
+      "error": 1.8142034661116426,
+      "error_absoluto": 1.8142034661116426
+    },
+    {
+      "municipio_codigo": "20301",
+      "municipio": "Corocoro",
+      "valor_real": 43.34477498093059,
+      "valor_predicho": 44.67764526857146,
+      "error": -1.3328702876408727,
+      "error_absoluto": 1.3328702876408727
+    },
+    {
+      "municipio_codigo": "20401",
+      "municipio": "Puerto Acosta",
+      "valor_real": 36.644457904300424,
+      "valor_predicho": 36.00683076109095,
+      "error": 0.6376271432094711,
+      "error_absoluto": 0.6376271432094711
+    },
+    {
+      "municipio_codigo": "20604",
+      "municipio": "Quiabaya",
+      "valor_real": 35.37023723939612,
+      "valor_predicho": 36.00683076109095,
+      "error": -0.6365935216948344,
+      "error_absoluto": 0.6365935216948344
+    },
+    {
+      "municipio_codigo": "21304",
+      "municipio": "Calamarca",
+      "valor_real": 46.22279129321383,
+      "valor_predicho": 45.9037722465952,
+      "error": 0.319019046618628,
+      "error_absoluto": 0.319019046618628
     }
   ],
   "residuos": {
     "definicion": "real - predicho",
-    "promedio": -1.0390677952452165,
-    "minimo": -6.565379087366452,
-    "maximo": 11.077043661339573,
-    "mae": 4.563589931600459
+    "promedio": -2.2510754189667495,
+    "minimo": -18.118461100762318,
+    "maximo": 8.504879785967518,
+    "mae": 5.047917838441659
   },
   "municipios_mayor_error": [
     {
-      "municipio_codigo": "21006",
-      "municipio": "Villa Libertad Licoma",
-      "valor_real": 51.042223409941215,
-      "valor_predicho": 39.96517974860164,
-      "error": 11.077043661339573,
-      "error_absoluto": 11.077043661339573
-    },
-    {
-      "municipio_codigo": "20608",
-      "municipio": "Teoponte",
-      "valor_real": 58.691873098652756,
-      "valor_predicho": 48.60134568980704,
-      "error": 10.090527408845716,
-      "error_absoluto": 10.090527408845716
-    },
-    {
-      "municipio_codigo": "20805",
-      "municipio": "La (Marka) San Andrés de Machaca",
-      "valor_real": 42.03596660244059,
-      "valor_predicho": 48.60134568980704,
-      "error": -6.565379087366452,
-      "error_absoluto": 6.565379087366452
+      "municipio_codigo": "20104",
+      "municipio": "Achocalla",
+      "valor_real": 68.85929925753206,
+      "valor_predicho": 86.97776035829438,
+      "error": -18.118461100762318,
+      "error_absoluto": 18.118461100762318
     },
     {
       "municipio_codigo": "21602",
       "municipio": "Curva",
       "valor_real": 33.9975845410628,
-      "valor_predicho": 39.96517974860164,
-      "error": -5.967595207538842,
-      "error_absoluto": 5.967595207538842
+      "valor_predicho": 42.55966223261794,
+      "error": -8.562077691555139,
+      "error_absoluto": 8.562077691555139
     },
     {
-      "municipio_codigo": "20905",
-      "municipio": "Cairoma",
-      "valor_real": 48.180703188879804,
-      "valor_predicho": 54.01683111946064,
-      "error": -5.836127930580837,
-      "error_absoluto": 5.836127930580837
+      "municipio_codigo": "20608",
+      "municipio": "Teoponte",
+      "valor_real": 58.691873098652756,
+      "valor_predicho": 50.18699331268524,
+      "error": 8.504879785967518,
+      "error_absoluto": 8.504879785967518
+    },
+    {
+      "municipio_codigo": "21006",
+      "municipio": "Villa Libertad Licoma",
+      "valor_real": 51.042223409941215,
+      "valor_predicho": 42.55966223261794,
+      "error": 8.482561177323277,
+      "error_absoluto": 8.482561177323277
+    },
+    {
+      "municipio_codigo": "21204",
+      "municipio": "Puerto Pérez",
+      "valor_real": 35.006273525721454,
+      "valor_predicho": 42.55966223261794,
+      "error": -7.5533887068964845,
+      "error_absoluto": 7.5533887068964845
     }
   ],
-  "interpretacion": "Se predijo el porcentaje municipal de viviendas con Internet mediante pct_urbano, pct_con_energia, pct_computadora, pct_celular, promedio_habitaciones, promedio_personas. CV seleccionó {'max_depth': 3, 'min_samples_leaf': 3, 'min_samples_split': 2}. En test, la diferencia absoluta promedio fue 4.564 puntos porcentuales y RMSE=5.293 pp. R²=0.6574; la variabilidad explicada debe interpretarse con el pequeño test municipal. El árbol superó al baseline según MSE (árbol=28.012; baseline=113.197 pp²). La mayor importancia corresponde a pct_celular (0.8692). Los mayores errores se observan en Villa Libertad Licoma, Teoponte, La (Marka) San Andrés de Machaca, Curva, Cairoma. Las importancias describen contribuciones a la predicción; no permiten atribuir efectos causales.",
+  "interpretacion": "Se predijo el porcentaje municipal de viviendas con Internet mediante pct_urbano, pct_con_energia, pct_computadora, pct_celular, pct_3_o_mas_habitaciones, promedio_personas. CV seleccionó {'max_depth': 7, 'min_samples_leaf': 1, 'min_samples_split': 8}. En test, la diferencia absoluta promedio fue 5.048 puntos porcentuales y RMSE=6.642 pp. R²=0.4604; la variabilidad explicada debe interpretarse con el pequeño test municipal. El árbol superó al baseline según MSE (árbol=44.113; baseline=113.197 pp²). La mayor importancia corresponde a pct_celular (0.8164). Los mayores errores se observan en Achocalla, Curva, Teoponte, Villa Libertad Licoma, Puerto Pérez. Las importancias describen contribuciones a la predicción; no permiten atribuir efectos causales.",
   "limitaciones": [
     "Solo 87 municipios, frente a modelos individuales con muchas más viviendas; test contiene 18 municipios.",
     "Una única partición y cinco folds producen una evaluación sensible a los territorios disponibles; la desviación CV no es un intervalo de confianza.",
     "Cada municipio pesa una vez, sin ponderar por número de viviendas; posibles dependencias espaciales no se modelan.",
-    "Promedio de habitaciones usa códigos: 8 representa ocho o más, por lo que es una aproximación inferior en esa categoría.",
+    "La comparación A/B comparte folds; su mejor MSE CV puede ser optimista tras selección y no sustituye la evaluación reservada en test.",
+    "A promedia códigos de habitaciones (8 = ocho o más); B evita esa aproximación, pero pierde detalle al agrupar en menos de tres/tres o más.",
     "Los porcentajes de equipamiento se calculan entre respuestas determinadas; se conservan conteos válidos para auditar no respuesta.",
     "Acceso declarado en el censo 2024; no mide calidad del servicio ni identifica causalidad o efectos individuales (riesgo de falacia ecológica).",
     "No se garantiza generalización a otros departamentos, años, países ni condiciones futuras."
@@ -1857,6 +2037,10 @@
     "gridsearch": "outputs/modelado/gridsearch_arbol_regresion.csv",
     "comparacion": "outputs/modelado/comparacion_baseline_arbol_regresion.csv",
     "particion": "outputs/modelado/particion_arbol_regresion.csv",
+    "comparacion_features": "outputs/modelado/comparacion_features_habitaciones.csv",
+    "fuentes_sha256": "outputs/modelado/fuentes_censo_sha256.json",
+    "reglas": "outputs/modelado/reglas_arbol_regresion.txt",
+    "folds_cv": "outputs/modelado/folds_cv_arbol_regresion.csv",
     "modelo": "outputs/modelos/arbol_regresion.joblib",
     "grafico_arbol": "outputs/graficos/arbol_regresion_niveles_0_3.png",
     "grafico_predicciones": "outputs/graficos/regresion_real_vs_predicho.png",

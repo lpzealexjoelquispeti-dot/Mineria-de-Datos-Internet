@@ -285,6 +285,8 @@ export interface RegressionTreeResponse {
   unidad_analisis: "Municipio";
   target: { nombre: string; indicador_eda: string; definicion: string; nota_leakage: string };
   variables_utilizadas: Array<{ variable: string; descripcion: string }>;
+  seleccion_features: { variante: "A" | "B"; variables: string[]; motivo: string };
+  comparacion_features: Array<{ variante: "A" | "B"; best_mse_cv: number; std_mse_cv: number; seleccionada: boolean }>;
   registros: {
     municipios: number;
     estadisticos_target: { minimo: number; maximo: number; promedio: number; mediana: number };
@@ -297,6 +299,8 @@ export interface RegressionTreeResponse {
     combinaciones_evaluadas: number;
     ajustes_cv: number;
     cv: number;
+    configuracion_cv: { tipo: "KFold"; n_splits: number; shuffle: boolean; random_state: number };
+    ajustes_cv_totales: number;
   };
   metricas: { train: RegressionMetrics; test: RegressionMetrics };
   baseline: { media_train: number; metricas_test: RegressionMetrics };

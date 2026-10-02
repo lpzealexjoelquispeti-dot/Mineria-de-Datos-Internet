@@ -19,13 +19,14 @@ import pandas as pd
 from sklearn.dummy import DummyRegressor
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.model_selection import GridSearchCV, KFold, train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.tree import DecisionTreeRegressor, plot_tree
+from sklearn.tree import DecisionTreeRegressor, export_text, plot_tree
 
 from src.logistic_regression import seleccionar_variables as limpiar_microdatos
 from src.mining import summarize_groups
 from src.pipeline import load_lapaz, read_dictionary
+from src.census_sources import verificar_fuentes_censo
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
@@ -35,10 +36,22 @@ RANDOM_STATE = 777
 TEST_SIZE = 0.20
 CV_FOLDS = 5
 SCORING = "neg_mean_squared_error"
-MODEL_FEATURES = [
+FEATURE_SET_PROMEDIO_HABITACIONES = [
     "pct_urbano", "pct_con_energia", "pct_computadora", "pct_celular",
     "promedio_habitaciones", "promedio_personas",
 ]
+FEATURE_SET_PCT_HABITACIONES = [
+    "pct_urbano", "pct_con_energia", "pct_computadora", "pct_celular",
+    "pct_3_o_mas_habitaciones", "promedio_personas",
+]
+FEATURE_SETS = {"A": FEATURE_SET_PROMEDIO_HABITACIONES, "B": FEATURE_SET_PCT_HABITACIONES}
+# Compatibilidad: X preparado representa A; el entrenamiento compara A/B y publica
+# las features finales en seleccion_features y en pipeline.feature_names_in_.
+MODEL_FEATURES = FEATURE_SET_PROMEDIO_HABITACIONES
+DATASET_FEATURES = list(dict.fromkeys([*MODEL_FEATURES, *FEATURE_SET_PCT_HABITACIONES]))
+SELECTED_FEATURE_SET = "seleccion_dinamica_por_cv_train"
+CV_TIE_ATOL = 1e-8  # pp²
+CV_TIE_RTOL = 1e-6  # diferencia relativa al menor MSE CV
 FORBIDDEN_FEATURES = {
     "v19e_inetfijo", "v19f_inetmovil", "v19e_f", "TIENE_ACCESO_INTERNET",
     "fijo_si", "fijo_no", "movil_si", "movil_no", "algun_si", "algun_no",
@@ -52,6 +65,7 @@ FEATURE_DESCRIPTIONS = {
     "pct_computadora": "Porcentaje con computadora/laptop/tablet entre respuestas determinadas",
     "pct_celular": "Porcentaje con teléfono celular entre respuestas determinadas",
     "promedio_habitaciones": "Media del código de habitaciones válido (8 = ocho o más)",
+    "pct_3_o_mas_habitaciones": "Porcentaje con tres o más habitaciones entre códigos válidos 1–8 (8 = ocho o más)",
     "promedio_personas": "Media de personas por vivienda con valor válido",
 }
 REFERENCE_URL = (
@@ -68,14 +82,17 @@ class MunicipalDataset:
     audit: dict[str, Any]
 
 
-def seleccionar_predictores(dataset: pd.DataFrame) -> pd.DataFrame:
+def seleccionar_predictores(dataset: pd.DataFrame, features: list[str] | None = None) -> pd.DataFrame:
     """Lista permitida cerrada; excluye identificadores y todo agregado de Internet."""
-    if FORBIDDEN_FEATURES.intersection(MODEL_FEATURES):
+    features = MODEL_FEATURES if features is None else features
+    if FORBIDDEN_FEATURES.intersection(features):
         raise ValueError("Predictores con fuga de información")
-    missing = set(MODEL_FEATURES).difference(dataset.columns)
+    if set(features).difference(DATASET_FEATURES):
+        raise ValueError("Predictores fuera de la lista permitida")
+    missing = set(features).difference(dataset.columns)
     if missing:
         raise ValueError(f"Faltan predictores: {sorted(missing)}")
-    X = dataset.loc[:, MODEL_FEATURES].astype(float).copy()
+    X = dataset.loc[:, features].astype(float).copy()
     if np.isinf(X.to_numpy()).any():
         raise ValueError("Predictores infinitos")
     return X
@@ -148,19 +165,24 @@ def construir_dataset_municipal(
             _code(dictionary, source, "No"): 0.0,
         })
     rows["promedio_habitaciones"] = cleaned["v13_habitac"]
+    rooms = cleaned["v13_habitac"]
+    valid_rooms = rooms.isin(range(1, 9))
+    # Unknowns quedan NaN: el denominador son los códigos válidos, nunca todos
+    # los registros con desconocidos recodificados a False/0.
+    rows["pct_3_o_mas_habitaciones"] = rooms.ge(3).astype(float).where(valid_rooms) * 100
     rows["promedio_personas"] = cleaned["tot_pers"]
     grouped = rows.groupby("municipio_codigo", sort=True)
-    features = grouped[MODEL_FEATURES].mean()
+    features = grouped[DATASET_FEATURES].mean()
     targets = summarize_groups(universe, ["municipio_codigo", "municipio"]).reset_index()
     targets = targets.rename(columns={"pct_algun": TARGET})
     targets = targets[["municipio_codigo", "municipio", "universo", TARGET]]
     validation = validar_target_eda(targets, eda)
     dataset = targets.merge(features, on="municipio_codigo", validate="one_to_one")
-    dataset = dataset[["municipio_codigo", "municipio", *MODEL_FEATURES, TARGET]].sort_values(
+    dataset = dataset[["municipio_codigo", "municipio", *DATASET_FEATURES, TARGET]].sort_values(
         "municipio_codigo").reset_index(drop=True)
     X = seleccionar_predictores(dataset)
     y = dataset[TARGET].astype(float)
-    counts = grouped[MODEL_FEATURES].count().add_prefix("validos_").reset_index()
+    counts = grouped[DATASET_FEATURES].count().add_prefix("validos_").reset_index()
     counts = counts.merge(targets[["municipio_codigo", "municipio", "universo"]],
                           on="municipio_codigo", validate="one_to_one")
     audit = {
@@ -173,10 +195,11 @@ def construir_dataset_municipal(
             "Target: todas las viviendas del universo TIC, incluido Internet sin especificar. "
             "Porcentajes predictores: respuestas determinadas de cada variable; "
             "9/vacíos no se recodifican como No. Medias: valores válidos según H3_1/H3_2. "
+            "Habitaciones 3+: códigos 3–8 / códigos válidos 1–8 × 100, dentro del universo TIC; 8 es ocho o más. "
             "No se imputa antes de agregar ni antes de separar train/test."
         ),
         "conteos_validos_municipales": counts.to_dict(orient="records"),
-        "faltantes_municipales": {c: int(X[c].isna().sum()) for c in MODEL_FEATURES},
+        "faltantes_municipales": {c: int(dataset[c].isna().sum()) for c in DATASET_FEATURES},
         "estadisticos_target": {"minimo": float(y.min()), "maximo": float(y.max()),
                                 "promedio": float(y.mean()), "mediana": float(y.median())},
     }
@@ -184,6 +207,7 @@ def construir_dataset_municipal(
 
 
 def preparar_dataset_modelo(project_root: Path, prefer_cache: bool = True) -> MunicipalDataset:
+    sources = verificar_fuentes_censo(project_root, guardar=False)
     source_dir = project_root / "Base de datos CSV"
     dictionary = read_dictionary(source_dir / "Diccionario de variables CPV 2024.xlsx")
     cached = project_root / "outputs/datos/vivienda_lapaz_seleccion.csv.gz"
@@ -193,7 +217,7 @@ def preparar_dataset_modelo(project_root: Path, prefer_cache: bool = True) -> Mu
     eda = pd.read_csv(project_root / "outputs/tablas/municipios.csv",
                       dtype={"municipio_codigo": str})
     prepared = construir_dataset_municipal(data, dictionary, eda)
-    prepared.audit.update({"registros_nacionales": int(national),
+    prepared.audit.update({"fuentes_verificadas": sources, "registros_nacionales": int(national),
                            "fuente_datos": str(cached.relative_to(project_root)) if use_cache
                            else "Base de datos CSV/Vivienda_CPV-2024.csv"})
     return prepared
@@ -215,13 +239,85 @@ def crear_grid() -> dict[str, list[int]]:
             "modelo__min_samples_leaf": list(range(1, 5))}
 
 
-def buscar_hiperparametros(X_train: pd.DataFrame, y_train: pd.Series) -> GridSearchCV:
+def crear_cv() -> KFold:
+    return KFold(n_splits=CV_FOLDS, shuffle=True, random_state=RANDOM_STATE)
+
+
+def buscar_hiperparametros(X_train: pd.DataFrame, y_train: pd.Series,
+                          cv: KFold | None = None) -> GridSearchCV:
     if len(X_train) < CV_FOLDS:
         raise ValueError("Se requieren al menos cinco municipios train para CV=5")
-    search = GridSearchCV(crear_pipeline(), crear_grid(), cv=CV_FOLDS, scoring=SCORING,
+    search = GridSearchCV(crear_pipeline(), crear_grid(), cv=crear_cv() if cv is None else cv, scoring=SCORING,
                           n_jobs=-1, return_train_score=True, error_score="raise")
     search.fit(X_train, y_train)
     return search
+
+
+def seleccionar_variante(comparison: list[dict[str, Any]]) -> dict[str, Any]:
+    """Selección solo por MSE CV train. No recibe test ni métricas externas.
+
+    Equivalencia predefinida: |A-B| <= 1e-8 + 1e-6 * min(MSE_A, MSE_B).
+    En ese caso B evita interpretar el código abierto 8 como exactamente ocho.
+    """
+    scores = {row["variante"]: float(row["best_mse_cv"]) for row in comparison}
+    if set(scores) != {"A", "B"} or not all(np.isfinite(v) and v >= 0 for v in scores.values()):
+        raise ValueError("Se requieren MSE CV finitos de ambas variantes A/B")
+    difference = scores["B"] - scores["A"]
+    tolerance = CV_TIE_ATOL + CV_TIE_RTOL * min(scores.values())
+    tie = abs(difference) <= tolerance
+    selected = "B" if tie else min(scores, key=scores.get)
+    return {"variante": selected, "variables": FEATURE_SETS[selected],
+            "criterio": SELECTED_FEATURE_SET, "diferencia_mse_b_menos_a": difference,
+            "empate_equivalente": tie, "tolerancia_absoluta_pp2": CV_TIE_ATOL,
+            "tolerancia_relativa": CV_TIE_RTOL, "tolerancia_aplicada_pp2": tolerance,
+            "motivo": "MSE CV prácticamente equivalente; B interpreta la categoría ocho o más sin promediarla."
+            if tie else f"Variante {selected} tiene menor MSE medio de validación cruzada sobre train."}
+
+
+def comparar_variantes(train_dataset: pd.DataFrame, y_train: pd.Series) -> tuple:
+    """Una partición train, un objeto KFold y el mismo grid para ambas variantes."""
+    cv = crear_cv()
+    searches, comparison = {}, []
+    for variant, features in FEATURE_SETS.items():
+        X_train = seleccionar_predictores(train_dataset, features)
+        search = buscar_hiperparametros(X_train, y_train, cv=cv)
+        searches[variant] = search
+        comparison.append({"variante": variant, "variables": features,
+                           "best_mse_cv": -float(search.best_score_),
+                           "std_mse_cv": float(search.cv_results_["std_test_score"][search.best_index_]),
+                           "best_params": {k.removeprefix("modelo__"): int(v) for k, v in search.best_params_.items()}})
+    selection = seleccionar_variante(comparison)
+    for row in comparison:
+        row["seleccionada"] = row["variante"] == selection["variante"]
+    return searches, comparison, selection
+
+
+def exportar_reglas(pipeline: Pipeline) -> str:
+    model = pipeline.named_steps["modelo"]
+    return export_text(model, feature_names=list(pipeline.feature_names_in_),
+                       decimals=6, max_depth=max(1, model.get_depth()))
+
+
+def explicar_prediccion(pipeline: Pipeline, municipio: pd.DataFrame) -> dict[str, Any]:
+    """Ruta real de una observación; valores imputados en la precisión del árbol."""
+    if len(municipio) != 1:
+        raise ValueError("La explicación requiere exactamente un municipio")
+    features = list(pipeline.feature_names_in_)
+    X = seleccionar_predictores(municipio, features)
+    transformed = pipeline.named_steps["imputador"].transform(X).astype(np.float32)
+    model = pipeline.named_steps["modelo"]
+    tree = model.tree_
+    leaf = int(model.apply(transformed)[0])
+    path = model.decision_path(transformed).indices
+    steps = []
+    for node in path:
+        if node == leaf:
+            continue
+        feature = int(tree.feature[node])
+        value, threshold = float(transformed[0, feature]), float(tree.threshold[node])
+        steps.append({"nodo": int(node), "feature": features[feature], "umbral": threshold,
+                      "valor": value, "condicion": "<=" if value <= threshold else ">"})
+    return {"ruta": steps, "hoja": leaf, "prediccion_final": float(model.predict(transformed)[0])}
 
 
 def calcular_metricas(y: pd.Series, predictions: np.ndarray) -> dict[str, float]:
@@ -243,7 +339,7 @@ def obtener_importancias(pipeline: Pipeline) -> pd.DataFrame:
     expected = 1.0 if model.tree_.node_count > 1 else 0.0
     if not np.isclose(values.sum(), expected, atol=1e-8):
         raise AssertionError("Importancias inconsistentes con la estructura del árbol")
-    return pd.DataFrame({"variable": MODEL_FEATURES, "importancia": values}).sort_values(
+    return pd.DataFrame({"variable": list(pipeline.feature_names_in_), "importancia": values}).sort_values(
         "importancia", ascending=False, kind="stable")
 
 
@@ -259,7 +355,7 @@ def crear_predicciones(dataset: pd.DataFrame, y_test: pd.Series, predictions: np
 def guardar_graficos(pipeline: Pipeline, predictions: pd.DataFrame, graphics_dir: Path) -> None:
     graphics_dir.mkdir(parents=True, exist_ok=True)
     fig, ax = plt.subplots(figsize=(24, 12))
-    plot_tree(pipeline.named_steps["modelo"], feature_names=MODEL_FEATURES,
+    plot_tree(pipeline.named_steps["modelo"], feature_names=list(pipeline.feature_names_in_),
               max_depth=3, filled=True, rounded=True, fontsize=8, ax=ax)
     ax.set_title("Árbol de regresión — niveles 0 a 3 (target en porcentaje)")
     fig.tight_layout()
@@ -301,9 +397,15 @@ def ejecutar_entrenamiento(project_root: Path, prefer_cache: bool = True,
             "target_nan": prepared.audit["target_nan"],
             "estadisticos_target": prepared.audit["estadisticos_target"],
         }}, ensure_ascii=False), file=sys.stderr)
+    # Solo train llega a la comparación. Test se transforma tras seleccionar.
+    searches, feature_comparison, selection = comparar_variantes(
+        prepared.dataset.loc[X_train.index], y_train)
+    final_features = selection["variables"]
+    X_train = seleccionar_predictores(prepared.dataset.loc[y_train.index], final_features)
+    X_test = seleccionar_predictores(prepared.dataset.loc[y_test.index], final_features)
     base = crear_pipeline().fit(X_train, y_train)
     base_metrics = evaluar_modelo(base, X_train, y_train)["metricas"]
-    search = buscar_hiperparametros(X_train, y_train)
+    search = searches[selection["variante"]]
     pipeline = search.best_estimator_
     train = evaluar_modelo(pipeline, X_train, y_train)
     test = evaluar_modelo(pipeline, X_test, y_test)
@@ -312,7 +414,12 @@ def ejecutar_entrenamiento(project_root: Path, prefer_cache: bool = True,
     importance = obtener_importancias(pipeline)
     predictions = crear_predicciones(prepared.dataset, y_test, test["predicciones"])
     model = pipeline.named_steps["modelo"]
-    cv_results = pd.DataFrame(search.cv_results_)
+    frames = []
+    for variant, candidate in searches.items():
+        frame = pd.DataFrame(candidate.cv_results_)
+        frame.insert(0, "variante", variant)
+        frames.append(frame)
+    cv_results = pd.concat(frames, ignore_index=True)
     cv_results["params"] = cv_results["params"].map(lambda p: json.dumps(p, sort_keys=True))
     best = search.best_index_
     cv_folds = [-float(search.cv_results_[f"split{i}_test_score"][best]) for i in range(CV_FOLDS)]
@@ -325,7 +432,7 @@ def ejecutar_entrenamiento(project_root: Path, prefer_cache: bool = True,
     top_errors = predictions.head(5).to_dict(orient="records")
     improved = test["metricas"]["mse"] < baseline["mse"]
     interpretation = (
-        f"Se predijo el porcentaje municipal de viviendas con Internet mediante {', '.join(MODEL_FEATURES)}. "
+        f"Se predijo el porcentaje municipal de viviendas con Internet mediante {', '.join(final_features)}. "
         f"CV seleccionó {params}. En test, la diferencia absoluta promedio fue "
         f"{test['metricas']['mae']:.3f} puntos porcentuales y RMSE={test['metricas']['rmse']:.3f} pp. "
         f"R²={test['metricas']['r2']:.4f}; "
@@ -346,6 +453,10 @@ def ejecutar_entrenamiento(project_root: Path, prefer_cache: bool = True,
         "gridsearch": "outputs/modelado/gridsearch_arbol_regresion.csv",
         "comparacion": "outputs/modelado/comparacion_baseline_arbol_regresion.csv",
         "particion": "outputs/modelado/particion_arbol_regresion.csv",
+        "comparacion_features": "outputs/modelado/comparacion_features_habitaciones.csv",
+        "fuentes_sha256": "outputs/modelado/fuentes_censo_sha256.json",
+        "reglas": "outputs/modelado/reglas_arbol_regresion.txt",
+        "folds_cv": "outputs/modelado/folds_cv_arbol_regresion.csv",
         "modelo": "outputs/modelos/arbol_regresion.joblib",
         "grafico_arbol": "outputs/graficos/arbol_regresion_niveles_0_3.png",
         "grafico_predicciones": "outputs/graficos/regresion_real_vs_predicho.png",
@@ -358,8 +469,11 @@ def ejecutar_entrenamiento(project_root: Path, prefer_cache: bool = True,
         "target": {"nombre": TARGET, "indicador_eda": "pct_algun", "unidad": "porcentaje (0–100)",
                    "definicion": "v19e_f=1 / universo TIC municipal × 100; incluye sin especificar en el denominador",
                    "nota_leakage": "Solo se utilizan seis predictores permitidos; Internet, sus agregados, target e identificadores quedan fuera de X."},
-        "variables_utilizadas": [{"variable": c, "descripcion": FEATURE_DESCRIPTIONS[c]} for c in MODEL_FEATURES],
+        "variables_utilizadas": [{"variable": c, "descripcion": FEATURE_DESCRIPTIONS[c]} for c in final_features],
         "registros": prepared.audit,
+        "seleccion_features": selection,
+        "comparacion_features": feature_comparison,
+        "fuentes_censo_sha256": prepared.audit["fuentes_verificadas"],
         "particion": {"train": len(X_train), "test": len(X_test), "test_size": TEST_SIZE,
                       "random_state": RANDOM_STATE, "estratificada": False,
                       "nota": "Se mantiene la convención 777 y 80/20 del proyecto frente a 22 y 70/30 del docente; sin stratify.",
@@ -367,15 +481,18 @@ def ejecutar_entrenamiento(project_root: Path, prefer_cache: bool = True,
                       "municipios_test": split.loc[X_test.index].to_dict(orient="records")},
         "modelo_base": {"parametros": {"random_state": RANDOM_STATE}, "metricas_train": base_metrics,
                         "nota": "Árbol base ilustrativo; test se evalúa solo con el modelo seleccionado mediante CV."},
-        "gridsearch": {"cv": CV_FOLDS, "scoring": SCORING, "n_jobs": -1,
+        "gridsearch": {"cv": CV_FOLDS, "configuracion_cv": {"tipo": "KFold", "n_splits": CV_FOLDS, "shuffle": True, "random_state": RANDOM_STATE}, "scoring": SCORING, "n_jobs": -1,
                        "best_params_": {k: int(v) for k, v in search.best_params_.items()},
                        "mejores_parametros": params, "best_score_": float(search.best_score_),
                        "mejor_mse_cv": -float(search.best_score_),
                        "std_mse_cv": float(search.cv_results_["std_test_score"][best]),
-                       "mse_folds": cv_folds, "combinaciones_evaluadas": len(cv_results),
-                       "ajustes_cv": len(cv_results) * CV_FOLDS, "reajustes_finales": 1,
+                       "mse_folds": cv_folds, "combinaciones_evaluadas": len(search.cv_results_["params"]),
+                       "ajustes_cv": len(search.cv_results_["params"]) * CV_FOLDS, "reajustes_finales": 1,
+                       "combinaciones_totales_variantes": len(cv_results),
+                       "ajustes_cv_totales": len(cv_results) * CV_FOLDS,
+                       "reajustes_totales_variantes": len(searches),
                        "valores_evaluados": crear_grid(),
-                       "estrategia": "Producto cartesiano completo; KFold=5 sin shuffle; imputación dentro de cada fold; solo train."},
+                       "estrategia": "Producto cartesiano completo por variante; KFold=5 shuffle=True, random_state=777 compartido; imputación dentro de cada fold; solo train."},
         "metricas": {"train": train["metricas"], "test": test["metricas"]},
         "unidades_metricas": {"mae": "pp", "rmse": "pp", "mse": "pp²", "r2": "adimensional"},
         "baseline": {"modelo": "DummyRegressor", "strategy": "mean", "media_train": float(y_train.mean()),
@@ -395,26 +512,37 @@ def ejecutar_entrenamiento(project_root: Path, prefer_cache: bool = True,
             f"Solo {len(prepared.dataset)} municipios, frente a modelos individuales con muchas más viviendas; test contiene {len(X_test)} municipios.",
             "Una única partición y cinco folds producen una evaluación sensible a los territorios disponibles; la desviación CV no es un intervalo de confianza.",
             "Cada municipio pesa una vez, sin ponderar por número de viviendas; posibles dependencias espaciales no se modelan.",
-            "Promedio de habitaciones usa códigos: 8 representa ocho o más, por lo que es una aproximación inferior en esa categoría.",
+            "La comparación A/B comparte folds; su mejor MSE CV puede ser optimista tras selección y no sustituye la evaluación reservada en test.",
+            "A promedia códigos de habitaciones (8 = ocho o más); B evita esa aproximación, pero pierde detalle al agrupar en menos de tres/tres o más.",
             "Los porcentajes de equipamiento se calculan entre respuestas determinadas; se conservan conteos válidos para auditar no respuesta.",
             "Acceso declarado en el censo 2024; no mide calidad del servicio ni identifica causalidad o efectos individuales (riesgo de falacia ecológica).",
             "No se garantiza generalización a otros departamentos, años, países ni condiciones futuras.",
         ], "artefactos": artifacts,
     }
+    comparison_features_csv = pd.DataFrame(feature_comparison)
+    for column in ("variables", "best_params"):
+        comparison_features_csv[column] = comparison_features_csv[column].map(
+            lambda value: json.dumps(value, ensure_ascii=False, sort_keys=True))
+    folds_table = pd.DataFrame({"fold": range(1, CV_FOLDS + 1), "mse_validacion": cv_folds})
     if save_outputs:
         for key, frame in (("dataset", prepared.dataset), ("predicciones", predictions),
                            ("importancia", importance), ("gridsearch", cv_results),
-                           ("comparacion", comparison), ("particion", split)):
+                           ("comparacion", comparison), ("particion", split),
+                           ("comparacion_features", comparison_features_csv), ("folds_cv", folds_table)):
             path = project_root / artifacts[key]
             path.parent.mkdir(parents=True, exist_ok=True)
             frame.to_csv(path, index=False, encoding="utf-8")
         model_path = project_root / artifacts["modelo"]
         model_path.parent.mkdir(parents=True, exist_ok=True)
         joblib.dump(pipeline, model_path, compress=3)
+        (project_root / artifacts["reglas"]).write_text(exportar_reglas(pipeline), encoding="utf-8")
+        (project_root / artifacts["fuentes_sha256"]).write_text(
+            json.dumps(prepared.audit["fuentes_verificadas"], ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8")
         guardar_graficos(pipeline, predictions, project_root / "outputs/graficos")
         (project_root / artifacts["metricas"]).write_text(
             json.dumps(results, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
     results["_runtime"] = {"pipeline": pipeline, "base": base, "baseline": dummy,
                            "prepared": prepared, "X_train": X_train, "X_test": X_test,
-                           "y_train": y_train, "y_test": y_test, "search": search}
+                           "y_train": y_train, "y_test": y_test, "search": search, "searches": searches}
     return results

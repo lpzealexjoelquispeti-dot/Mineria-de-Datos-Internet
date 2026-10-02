@@ -17,7 +17,7 @@ const METRICS: Array<{ key: keyof RegressionMetrics; label: string; unit: string
 const LABELS: Record<string, string> = {
   pct_urbano: "Viviendas urbanas", pct_con_energia: "Electricidad",
   pct_computadora: "Computadora", pct_celular: "Celular",
-  promedio_habitaciones: "Habitaciones", promedio_personas: "Personas",
+  pct_3_o_mas_habitaciones: "3+ habitaciones", promedio_habitaciones: "Habitaciones", promedio_personas: "Personas",
 };
 const decimal = (value: number) => value.toLocaleString("es-BO", { maximumFractionDigits: 3 });
 
@@ -114,6 +114,9 @@ export function RegressionTreeSection() {
             </div>
             <p className="model-disclaimer">{model.gridsearch.combinaciones_evaluadas} configuraciones · {model.gridsearch.ajustes_cv} ajustes CV. MSE CV: {decimal(model.gridsearch.mejor_mse_cv)} pp²; desviación: {decimal(model.gridsearch.std_mse_cv)} pp².</p>
             <p className="model-disclaimer">Target mínimo {formatPercent(model.registros.estadisticos_target.minimo)}, máximo {formatPercent(model.registros.estadisticos_target.maximo)}, media {formatPercent(model.registros.estadisticos_target.promedio)} y mediana {formatPercent(model.registros.estadisticos_target.mediana)}.</p>
+            <p className="model-disclaimer">CV: {model.gridsearch.configuracion_cv.tipo}, {model.gridsearch.cv} folds con shuffle y semilla {model.gridsearch.configuracion_cv.random_state}. Dos variantes, {formatNumber(model.gridsearch.ajustes_cv_totales)} ajustes CV en total.</p>
+            <p className="model-disclaimer">Habitaciones: variante {model.seleccion_features.variante} · {model.seleccion_features.variante === "B" ? "Porcentaje con tres o más" : "Promedio de códigos"}. Selección mediante MSE CV de train.</p>
+            <p className="model-disclaimer">Variables seleccionadas: {model.seleccion_features.variables.map((variable) => LABELS[variable] ?? variable).join(", ")}.</p>
             <p className="leakage-note">{model.target.nota_leakage}</p>
           </article>
         </div>

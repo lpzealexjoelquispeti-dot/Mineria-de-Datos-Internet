@@ -187,7 +187,7 @@ H3_3 predice el **porcentaje de viviendas con acceso a Internet de cada municipi
 
 El target conserva exactamente `pct_algun` del EDA: `v19e_f = 1 / universo TIC municipal × 100`, incluyendo respuestas sin especificar en el denominador. Se reutilizan la lectura y el diccionario de `src.pipeline`, la agregación de `src.mining` y la limpieza de H3_1/H3_2. El flujo se detiene si los códigos, nombres, denominadores o porcentajes discrepan de `outputs/tablas/municipios.csv` (tolerancia absoluta de 1e-8 puntos porcentuales). Los municipios se ordenan por código y no se duplican ni se generan observaciones sintéticas.
 
-Predictores finales:
+Predictores comunes y dos alternativas de habitaciones (seis variables por variante):
 
 | Variable | Construcción municipal |
 |---|---|
@@ -195,7 +195,8 @@ Predictores finales:
 | `pct_con_energia` | Porcentaje con electricidad; diccionario oficial: disponibilidad 1–4, ausencia 5 |
 | `pct_computadora` | Porcentaje con computadora/laptop/tablet entre respuestas determinadas |
 | `pct_celular` | Porcentaje con teléfono celular entre respuestas determinadas |
-| `promedio_habitaciones` | Media de códigos válidos 1–8; 8 significa ocho o más |
+| `promedio_habitaciones` (A) | Media de códigos válidos 1–8; 8 significa ocho o más |
+| `pct_3_o_mas_habitaciones` (B) | Códigos 3–8 / respuestas válidas 1–8 × 100 dentro del universo TIC; los inválidos quedan ausentes |
 | `promedio_personas` | Media de valores válidos 0–9999 |
 
 Los predictores se agregan sobre el mismo universo TIC, sin filtrar por acceso a Internet. Computadora y celular conservan la limpieza existente: 9 y vacíos son ausentes; no se convierten en No. Sus tasas utilizan respuestas determinadas por variable. Las medias excluyen valores inválidos. Se guardan conteos válidos por municipio y faltantes municipales en el JSON para auditar los denominadores. No se imputan microdatos antes de agregar.
@@ -210,7 +211,19 @@ python scripts/entrenar_arbol_regresion.py --forzar-fuente
 
 La partición reproducible usa `random_state=777` y `test_size=0.20`, **sin stratify**: se mantiene la convención del proyecto frente a 22 y 70/30 del [notebook oficial del docente](https://github.com/ealaurel/MINERIA_DATOS_2026_2/blob/main/h3_3_Arboles_de_decisi%C3%B3n_regresion.ipynb). Se guardan explícitamente los municipios train/test. Antes de ajustar se informan cantidad de municipios, partición, duplicados, NaN y estadísticos del target.
 
-`GridSearchCV` explora el producto cartesiano completo: profundidades 1–19, `min_samples_split` 2–9 y `min_samples_leaf` 1–4: **608 configuraciones, 3.040 ajustes CV y un reajuste final**. Usa CV=5 (KFold sin shuffle), `scoring="neg_mean_squared_error"`, `n_jobs=-1` y solo train. Se conserva `best_estimator_` y se guardan resultados completos, `best_params_`, `best_score_`, MSE CV positivo, desviación estándar y MSE de cada fold. Test queda reservado para la evaluación final.
+`GridSearchCV` explora el producto cartesiano completo: profundidades 1–19, `min_samples_split` 2–9 y `min_samples_leaf` 1–4: **608 configuraciones, 3.040 ajustes CV y un reajuste por variante** (6.080 ajustes CV y dos reajustes en total). Usa un mismo `KFold(n_splits=5, shuffle=True, random_state=777)` para A/B, `scoring="neg_mean_squared_error"`, `n_jobs=-1` y solo train. Shuffle evita que los folds dependan del orden municipal y conserva reproducibilidad; no resuelve dependencia espacial.
+
+Se comparan A (promedio de habitaciones) y B (porcentaje con tres o más) sobre el mismo dataset, índices train/test y folds. Se selecciona el menor MSE medio CV; si `|MSE_A - MSE_B| <= 1e-8 + 1e-6 × min(MSE_A, MSE_B)` pp², se prefiere B por interpretar correctamente la categoría abierta 8. **La selección no recibe test**. Después se evalúa una vez el árbol elegido en los 18 municipios test. Las constantes `FEATURE_SET_PROMEDIO_HABITACIONES` y `FEATURE_SET_PCT_HABITACIONES` conservan las alternativas; `SELECTED_FEATURE_SET` declara la política dinámica. `MODEL_FEATURES` mantiene A para compatibilidad al preparar X, y las features finales se leen de `seleccion_features.variables` o `pipeline.feature_names_in_`.
+
+Se conserva el `best_estimator_` elegido, los resultados completos de ambas búsquedas (columna `variante`), parámetros, MSE CV, desviación y MSE por fold. `comparacion_features_habitaciones.csv` documenta ambas variantes y la elección sin métricas test; `folds_cv_arbol_regresion.csv` corresponde al árbol elegido.
+
+Antes de preparar H3_3 se recalculan los SHA-256 y tamaños de los dos originales con `src.pipeline.sha256`. Se contrastan con `outputs/resumen_eda.json` y con el manifiesto previo cuando exista; un cambio detiene el flujo sin sobrescribir la referencia. No se descargan archivos. El manifiesto conserva rutas relativas para permitir trasladar el repositorio. Puede ejecutarse por separado:
+
+```bash
+python scripts/verificar_fuentes_censo.py
+```
+
+`reglas_arbol_regresion.txt` se genera con `export_text` del mismo `best_estimator_`, usando los nombres seleccionados y el árbol completo. Los umbrales del texto se redondean a seis decimales; `explicar_prediccion(pipeline, municipio)` permite consultar la ruta real con nodo, feature, umbral, valor imputado, condición y predicción final, sin ajustar otro modelo.
 
 Se calculan **MSE, RMSE, MAE y R²** en train/test. MAE y RMSE se interpretan en puntos porcentuales, MSE en pp²; R² puede ser negativo y se conserva. `DummyRegressor(strategy="mean")` aprende únicamente la media de train y se compara en el mismo test. Se extraen importancias reales sin interpretarlas como efectos causales, estructura del árbol, predicciones identificadas y residuos (`real − predicho`). El árbol base se evalúa solo en train para ilustrar el problema.
 
@@ -223,6 +236,10 @@ Artefactos agregados y modelo:
 - `outputs/modelado/gridsearch_arbol_regresion.csv`;
 - `outputs/modelado/comparacion_baseline_arbol_regresion.csv`;
 - `outputs/modelado/particion_arbol_regresion.csv`;
+- `outputs/modelado/comparacion_features_habitaciones.csv`;
+- `outputs/modelado/folds_cv_arbol_regresion.csv`;
+- `outputs/modelado/fuentes_censo_sha256.json`;
+- `outputs/modelado/reglas_arbol_regresion.txt`;
 - `outputs/modelos/arbol_regresion.joblib`;
 - `outputs/graficos/arbol_regresion_niveles_0_3.png`;
 - `outputs/graficos/regresion_real_vs_predicho.png`;
@@ -237,7 +254,7 @@ python -m pytest -q tests
 
 `GET /api/mineria/arbol-regresion` lee exclusivamente el JSON previamente calculado; no carga microdatos ni entrena durante una request. Si falta, devuelve 503. El dashboard añade **Árbol de Decisión — Regresión** bajo **Predicción territorial**, con métricas, municipios, hiperparámetros, estructura, importancia, Real vs. Predicho, comparación con baseline y errores municipales. Su carga es independiente, de modo que un fallo de H3_3 no bloquea H3_1/H3_2.
 
-**Limitaciones:** hay muchas menos observaciones que en los modelos individuales. Cada municipio pesa una vez, sin ponderar viviendas, y la evaluación depende de una única partición pequeña; la desviación CV no es un intervalo de confianza. No se modela dependencia espacial. Habitaciones está truncada en ocho o más; las tasas de equipamiento dependen de respuestas determinadas. Son asociaciones territoriales de acceso declarado en 2024, sin inferencia causal ni individual (riesgo de falacia ecológica). No se garantiza generalización a otros departamentos, años, países ni condiciones futuras.
+**Limitaciones:** hay muchas menos observaciones que en los modelos individuales. Cada municipio pesa una vez, sin ponderar viviendas, y la evaluación depende de una única partición pequeña; la desviación CV no es un intervalo de confianza. No se modela dependencia espacial. La media de habitaciones A aproxima la categoría ocho o más; B evita esa aproximación pero agrupa la cantidad en dos categorías. La selección A/B puede volver optimista el mejor MSE CV; el test reservado es la evaluación externa a esa selección. Las tasas de equipamiento dependen de respuestas determinadas. Son asociaciones territoriales de acceso declarado en 2024, sin inferencia causal ni individual (riesgo de falacia ecológica). No se garantiza generalización a otros departamentos, años, países ni condiciones futuras.
 
 ## Backend
 
@@ -376,11 +393,13 @@ Mineria-de-Datos-Internet/
 │   ├── logistic_regression.py
 │   ├── decision_tree_classification.py
 │   ├── decision_tree_regression.py
+│   ├── census_sources.py
 │   └── pipeline.py
 ├── scripts/
 │   ├── entrenar_regresion_logistica.py
 │   ├── entrenar_arbol_clasificacion.py
-│   └── entrenar_arbol_regresion.py
+│   ├── entrenar_arbol_regresion.py
+│   └── verificar_fuentes_censo.py
 ├── notebooks/
 │   ├── EDA_Internet_LaPaz.ipynb
 │   ├── Regresion_Logistica_Internet_LaPaz.ipynb

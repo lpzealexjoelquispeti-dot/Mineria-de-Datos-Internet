@@ -1,7 +1,7 @@
 variable,importancia
-pct_celular,0.8692453740769455
-pct_con_energia,0.13075462592305442
-pct_urbano,0.0
-pct_computadora,0.0
-promedio_habitaciones,0.0
-promedio_personas,0.0
+pct_celular,0.816376344818981
+pct_urbano,0.11590039509783844
+pct_computadora,0.03411113265037999
+pct_con_energia,0.018939579149610083
+pct_3_o_mas_habitaciones,0.01200651951315113
+promedio_personas,0.0026660287700392095
