@@ -196,3 +196,119 @@ export interface LogisticRegressionResponse {
   };
   interpretacion_primera_iteracion: string;
 }
+
+export interface TreeImportance {
+  feature?: string;
+  variable_original: string;
+  categoria_codigo?: string | null;
+  categoria?: string | null;
+  importancia: number;
+}
+
+export interface ModelComparison extends LogisticMetrics {
+  modelo: string;
+}
+
+export interface DecisionTreeResponse {
+  objetivo: string;
+  target: LogisticRegressionResponse["target"];
+  variables_utilizadas: LogisticVariable[];
+  registros: LogisticRegressionResponse["registros"];
+  distribucion_clases_total: LogisticRegressionResponse["distribucion_clases_total"];
+  particion: LogisticRegressionResponse["particion"];
+  gridsearch: {
+    cv: number;
+    scoring: string;
+    n_jobs: number;
+    mejores_parametros: {
+      max_depth: number;
+      min_samples_split: number;
+      min_samples_leaf: number;
+    };
+    mejor_roc_auc_cv: number;
+    combinaciones_evaluadas: number;
+    ajustes_cv: number;
+    estrategia: string;
+    motivo_reduccion: string;
+  };
+  umbral_estandar: number;
+  metricas: { train: LogisticMetrics; test: LogisticMetrics };
+  matriz_confusion_test: LogisticRegressionResponse["matriz_confusion_test"];
+  classification_report_test: Record<string, unknown>;
+  roc: LogisticRegressionResponse["roc"];
+  seleccion_umbral_roc: {
+    umbral: number;
+    criterio: string;
+    origen: string;
+    indice_youden: number;
+    metricas_train: LogisticMetrics;
+    metricas_test: LogisticMetrics;
+    matriz_confusion_test: LogisticRegressionResponse["matriz_confusion_test"];
+  };
+  importancia_variables: {
+    transformadas: TreeImportance[];
+    agregadas: TreeImportance[];
+    suma_agregada: number;
+  };
+  estructura_arbol: {
+    profundidad: number;
+    nodos: number;
+    hojas: number;
+    visualizacion_max_depth: number;
+    nota_visualizacion: string;
+  };
+  comparacion_modelos: ModelComparison[];
+  verificacion_comparabilidad: Record<string, boolean>;
+  interpretacion: string;
+  artefactos: Record<string, string>;
+}
+
+
+export interface RegressionMetrics {
+  mse: number;
+  rmse: number;
+  mae: number;
+  r2: number;
+}
+
+export interface MunicipalPrediction {
+  municipio_codigo: string;
+  municipio: string;
+  valor_real: number;
+  valor_predicho: number;
+  error: number;
+  error_absoluto: number;
+}
+
+export interface RegressionTreeResponse {
+  objetivo: string;
+  unidad_analisis: "Municipio";
+  target: { nombre: string; indicador_eda: string; definicion: string; nota_leakage: string };
+  variables_utilizadas: Array<{ variable: string; descripcion: string }>;
+  seleccion_features: { variante: "A" | "B"; variables: string[]; motivo: string };
+  comparacion_features: Array<{ variante: "A" | "B"; best_mse_cv: number; std_mse_cv: number; seleccionada: boolean }>;
+  registros: {
+    municipios: number;
+    estadisticos_target: { minimo: number; maximo: number; promedio: number; mediana: number };
+  };
+  particion: { train: number; test: number; random_state: number; test_size: number; nota: string };
+  gridsearch: {
+    mejores_parametros: { max_depth: number; min_samples_split: number; min_samples_leaf: number };
+    mejor_mse_cv: number;
+    std_mse_cv: number;
+    combinaciones_evaluadas: number;
+    ajustes_cv: number;
+    cv: number;
+    configuracion_cv: { tipo: "KFold"; n_splits: number; shuffle: boolean; random_state: number };
+    ajustes_cv_totales: number;
+  };
+  metricas: { train: RegressionMetrics; test: RegressionMetrics };
+  baseline: { media_train: number; metricas_test: RegressionMetrics };
+  importancia_variables: Array<{ variable: string; importancia: number }>;
+  estructura_arbol: { profundidad: number; nodos: number; hojas: number };
+  real_vs_predicho: MunicipalPrediction[];
+  municipios_mayor_error: MunicipalPrediction[];
+  residuos: { promedio: number; minimo: number; maximo: number; mae: number };
+  interpretacion: string;
+  limitaciones: string[];
+}

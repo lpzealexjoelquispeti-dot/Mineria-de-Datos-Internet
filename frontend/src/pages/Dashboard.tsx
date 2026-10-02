@@ -3,6 +3,8 @@ import { Activity, Database, RadioTower, Router, WifiOff } from "lucide-react";
 
 import { AreaChart } from "../components/AreaChart";
 import { DistributionChart } from "../components/DistributionChart";
+import { RegressionTreeSection } from "../components/RegressionTreeSection";
+import { DecisionTreeSection } from "../components/DecisionTreeSection";
 import { FindingsSection } from "../components/FindingsSection";
 import { Header } from "../components/Header";
 import { KpiCard } from "../components/KpiCard";
@@ -74,7 +76,13 @@ export default function Dashboard() {
 
           <OutliersSection outliers={data.outliers} />
           <FindingsSection findings={data.hallazgos} />
+          <div className="rankings-heading">
+            <div><p className="section-number">MODELOS DE MINERÍA DE DATOS</p><h2>Clasificación del acceso a Internet</h2></div>
+            <p>H3_1 / H3_2 · una observación = vivienda</p>
+          </div>
           <LogisticRegressionSection model={data.regresion} />
+          <DecisionTreeSection model={data.arbol} />
+          <RegressionTreeSection />
 
           <footer className="method-footer">
             <div>

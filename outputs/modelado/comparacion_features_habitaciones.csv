@@ -1,0 +1,3 @@
+variante,variables,best_mse_cv,std_mse_cv,best_params,seleccionada
+A,"[""pct_urbano"", ""pct_con_energia"", ""pct_computadora"", ""pct_celular"", ""promedio_habitaciones"", ""promedio_personas""]",33.12846462644596,10.453981312607002,"{""max_depth"": 7, ""min_samples_leaf"": 1, ""min_samples_split"": 8}",False
+B,"[""pct_urbano"", ""pct_con_energia"", ""pct_computadora"", ""pct_celular"", ""pct_3_o_mas_habitaciones"", ""promedio_personas""]",32.30524610568538,11.463718427922943,"{""max_depth"": 7, ""min_samples_leaf"": 1, ""min_samples_split"": 8}",True

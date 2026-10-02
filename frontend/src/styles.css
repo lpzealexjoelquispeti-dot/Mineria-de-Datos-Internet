@@ -282,6 +282,16 @@ main {
 .association-positive { color: #126067; background: #dff3f1; }
 .association-negative { color: #984b3e; background: #fae8e3; }
 .model-disclaimer { margin: 16px 0 0; color: var(--muted); font-size: .76rem; line-height: 1.55; }
+.model-hero--tree { background: linear-gradient(120deg, #38210d, #7e4924); }
+.model-hero--tree .model-hero__facts strong { color: #ffd49a; }
+.model-context--tree { background: #f7ead9; }
+.tree-params { display: grid; gap: 10px; margin-top: 18px; }
+.tree-params div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px; border-radius: 9px; background: #f6f0e9; }
+.tree-params code { color: #714421; font-size: .8rem; }
+.tree-params strong { color: #38210d; font-size: 1.05rem; }
+.importance-chart { height: 350px; margin-top: 12px; }
+.model-card--comparison { margin-top: 18px; }
+.comparison-chart { height: 360px; margin-top: 12px; }
 
 .empty-state { display: grid; place-items: center; min-height: 220px; color: var(--muted); text-align: center; }
 .empty-state svg { color: #96a9b8; }
@@ -366,3 +376,18 @@ main {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; }
 }
+
+.model-hero--regression { background: linear-gradient(120deg, #123e45, #167f87); }
+.model-metrics.regression-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.regression-scatter { height: 380px; margin-top: 12px; }
+.regression-tooltip { padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: white; box-shadow: 0 5px 20px #11274420; }
+.regression-tooltip p { margin: 6px 0 0; font-size: .8rem; }
+.regression-table-wrap { overflow-x: auto; margin-top: 12px; }
+.regression-table { width: 100%; min-width: 650px; border-collapse: collapse; font-size: .83rem; }
+.regression-table caption { padding: 10px; text-align: left; color: var(--muted); }
+.regression-table th, .regression-table td { padding: 12px 8px; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
+.regression-table th:first-child { text-align: left; }
+.regression-table th small { display: block; margin-top: 3px; color: var(--muted); font-weight: 400; }
+.regression-limitations { padding-left: 20px; color: var(--muted); font-size: .85rem; line-height: 1.65; }
+@media (max-width: 720px) { .model-metrics.regression-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 440px) { .model-metrics.regression-metrics { grid-template-columns: 1fr; } }

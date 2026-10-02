@@ -4,6 +4,7 @@ import { api } from "../services/api";
 import type {
   AreaFilter,
   AreaResponse,
+  DecisionTreeResponse,
   DistribucionResponse,
   HallazgosResponse,
   LogisticRegressionResponse,
@@ -25,6 +26,7 @@ export interface DashboardData {
   hallazgos: HallazgosResponse;
   metadata: MetadataResponse;
   regresion: LogisticRegressionResponse;
+  arbol: DecisionTreeResponse;
 }
 
 interface DashboardState {
@@ -58,9 +60,10 @@ export function useDashboard(area: AreaFilter, metric: MetricFilter): DashboardS
       api.hallazgos(signal),
       api.metadata(signal),
       api.regresionLogistica(signal),
+      api.arbolClasificacion(signal),
     ])
-      .then(([resumen, areas, top, bottom, distribucion, outliers, hallazgos, metadata, regresion]) => {
-        setData({ resumen, areas, top, bottom, distribucion, outliers, hallazgos, metadata, regresion });
+      .then(([resumen, areas, top, bottom, distribucion, outliers, hallazgos, metadata, regresion, arbol]) => {
+        setData({ resumen, areas, top, bottom, distribucion, outliers, hallazgos, metadata, regresion, arbol });
       })
       .catch((cause: unknown) => {
         if (cause instanceof DOMException && cause.name === "AbortError") return;

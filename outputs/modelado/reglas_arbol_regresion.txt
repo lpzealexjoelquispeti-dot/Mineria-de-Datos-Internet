@@ -1,0 +1,58 @@
+|--- pct_celular <= 86.550304
+|   |--- pct_celular <= 81.898121
+|   |   |--- pct_celular <= 75.235550
+|   |   |   |--- value: [31.727548]
+|   |   |--- pct_celular >  75.235550
+|   |   |   |--- pct_celular <= 80.215298
+|   |   |   |   |--- pct_computadora <= 7.853408
+|   |   |   |   |   |--- value: [36.006831]
+|   |   |   |   |--- pct_computadora >  7.853408
+|   |   |   |   |   |--- value: [42.559662]
+|   |   |   |--- pct_celular >  80.215298
+|   |   |   |   |--- pct_3_o_mas_habitaciones <= 28.132560
+|   |   |   |   |   |--- value: [44.677645]
+|   |   |   |   |--- pct_3_o_mas_habitaciones >  28.132560
+|   |   |   |   |   |--- value: [39.892996]
+|   |--- pct_celular >  81.898121
+|   |   |--- pct_con_energia <= 82.397385
+|   |   |   |--- pct_celular <= 84.839970
+|   |   |   |   |--- pct_urbano <= 20.813654
+|   |   |   |   |   |--- pct_3_o_mas_habitaciones <= 13.888218
+|   |   |   |   |   |   |--- value: [49.765714]
+|   |   |   |   |   |--- pct_3_o_mas_habitaciones >  13.888218
+|   |   |   |   |   |   |--- pct_computadora <= 6.105488
+|   |   |   |   |   |   |   |--- value: [40.123804]
+|   |   |   |   |   |   |--- pct_computadora >  6.105488
+|   |   |   |   |   |   |   |--- value: [45.903772]
+|   |   |   |   |--- pct_urbano >  20.813654
+|   |   |   |   |   |--- value: [49.631712]
+|   |   |   |--- pct_celular >  84.839970
+|   |   |   |   |--- promedio_personas <= 2.231400
+|   |   |   |   |   |--- value: [46.157735]
+|   |   |   |   |--- promedio_personas >  2.231400
+|   |   |   |   |   |--- pct_con_energia <= 77.334095
+|   |   |   |   |   |   |--- value: [50.186993]
+|   |   |   |   |   |--- pct_con_energia >  77.334095
+|   |   |   |   |   |   |--- value: [52.526823]
+|   |   |--- pct_con_energia >  82.397385
+|   |   |   |--- value: [54.016831]
+|--- pct_celular >  86.550304
+|   |--- pct_urbano <= 88.684383
+|   |   |--- pct_celular <= 88.131950
+|   |   |   |--- pct_computadora <= 8.140999
+|   |   |   |   |--- value: [44.028103]
+|   |   |   |--- pct_computadora >  8.140999
+|   |   |   |   |--- pct_con_energia <= 79.928276
+|   |   |   |   |   |--- value: [61.795633]
+|   |   |   |   |--- pct_con_energia >  79.928276
+|   |   |   |   |   |--- value: [56.106215]
+|   |   |--- pct_celular >  88.131950
+|   |   |   |--- pct_computadora <= 15.304703
+|   |   |   |   |--- value: [61.360298]
+|   |   |   |--- pct_computadora >  15.304703
+|   |   |   |   |--- pct_3_o_mas_habitaciones <= 42.625490
+|   |   |   |   |   |--- value: [69.278275]
+|   |   |   |   |--- pct_3_o_mas_habitaciones >  42.625490
+|   |   |   |   |   |--- value: [64.030143]
+|   |--- pct_urbano >  88.684383
+|   |   |--- value: [86.977760]
