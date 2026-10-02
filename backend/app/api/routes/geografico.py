@@ -1,8 +1,9 @@
 from typing import Literal
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.schemas.responses import (
+    ArbolClasificacionResponse,
     DistribucionResponse,
     OutliersResponse,
     RegresionLogisticaResponse,
@@ -32,3 +33,13 @@ def get_logistic_regression(
     service: DataService = Depends(get_data_service),
 ) -> RegresionLogisticaResponse:
     return service.get_logistic_regression()
+
+
+@router.get("/arbol-clasificacion", response_model=ArbolClasificacionResponse)
+def get_decision_tree(
+    service: DataService = Depends(get_data_service),
+) -> ArbolClasificacionResponse:
+    try:
+        return service.get_decision_tree()
+    except FileNotFoundError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error

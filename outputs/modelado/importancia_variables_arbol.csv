@@ -1,0 +1,20 @@
+feature,variable_original,categoria_codigo,categoria,importancia
+v19d_celular_2,v19d_celular,2,No,0.5553222307382569
+v19c_compu_2,v19c_compu,2,No,0.29376481075425037
+urbrur_1,urbrur,1,Urbana,0.10171310624931658
+tot_pers,tot_pers,,,0.03466811726522854
+v09_energia_5,v09_energia,5,No tiene,0.004248142273113267
+v09_energia_1,v09_energia,1,Servicio público de energía eléctrica,0.0024206526708712016
+v01_tipoviv_3,v01_tipoviv,3,Departamento,0.002101066667999711
+v01_tipoviv_1,v01_tipoviv,1,Casa,0.0019774616260087928
+v13_habitac,v13_habitac,,,0.0018400075843505504
+v01_tipoviv_4,v01_tipoviv,4,Cuarto(s) o habitación(es) suelta(s),0.0006338310629351934
+v01_tipoviv_5,v01_tipoviv,5,Vivienda improvisada o vivienda móvil,0.000537097045124668
+v09_energia_2,v09_energia,2,Motor propio (Generador),0.0003433026041293497
+v09_energia_3,v09_energia,3,Panel solar,0.00023052377352870688
+v09_energia_4,v09_energia,4,Otro,9.460745627669442e-05
+v01_tipoviv_2,v01_tipoviv,2,"Choza, pahuichi",8.88101227459401e-05
+v01_tipoviv_6,v01_tipoviv,6,Establecimiento no destinado para vivienda,1.623210586367266e-05
+urbrur_2,urbrur,2,Rural,0.0
+v19c_compu_1,v19c_compu,1,Sí,0.0
+v19d_celular_1,v19d_celular,1,Sí,0.0
