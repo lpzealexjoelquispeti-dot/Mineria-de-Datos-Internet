@@ -2,6 +2,7 @@ import type {
   AreaFilter,
   AreaResponse,
   DecisionTreeResponse,
+  RegressionTreeResponse,
   DistribucionResponse,
   HallazgosResponse,
   LogisticRegressionResponse,
@@ -30,6 +31,8 @@ async function request<T>(path: string, signal?: AbortSignal): Promise<T> {
 
 
 export const api = {
+  arbolRegresion: (signal?: AbortSignal) =>
+    request<RegressionTreeResponse>("/api/mineria/arbol-regresion", signal),
   resumen: (signal?: AbortSignal) => request<Resumen>("/api/resumen", signal),
   areas: (signal?: AbortSignal) =>
     request<AreaResponse>("/api/conectividad/area", signal),

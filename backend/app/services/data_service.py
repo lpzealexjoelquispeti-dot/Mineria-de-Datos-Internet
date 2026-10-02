@@ -12,6 +12,7 @@ from typing import Any
 from app.core.config import settings
 from app.schemas.responses import (
     ArbolClasificacionResponse,
+    ArbolRegresionResponse,
     AreaConectividad,
     AreaResponse,
     CalidadResponse,
@@ -83,6 +84,15 @@ class DataService:
         if not path.is_file():
             raise FileNotFoundError(
                 f"No existe {path}. Ejecute: python scripts/entrenar_arbol_clasificacion.py"
+            )
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    @lru_cache(maxsize=1)
+    def regression_tree_summary(self) -> dict[str, Any]:
+        path = self.outputs_dir / "modelado" / "metricas_arbol_regresion.json"
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"No existe {path}. Ejecute: python scripts/entrenar_arbol_regresion.py"
             )
         return json.loads(path.read_text(encoding="utf-8"))
 
@@ -335,6 +345,10 @@ class DataService:
         """Expone H3_2 desde artefactos; nunca entrena dentro de FastAPI."""
 
         return ArbolClasificacionResponse.model_validate(self.decision_tree_summary())
+
+    def get_regression_tree(self) -> ArbolRegresionResponse:
+        """Expone H3_3 previamente calculado; no carga microdatos ni modelos."""
+        return ArbolRegresionResponse.model_validate(self.regression_tree_summary())
 
 
 @lru_cache(maxsize=1)

@@ -262,3 +262,49 @@ export interface DecisionTreeResponse {
   interpretacion: string;
   artefactos: Record<string, string>;
 }
+
+
+export interface RegressionMetrics {
+  mse: number;
+  rmse: number;
+  mae: number;
+  r2: number;
+}
+
+export interface MunicipalPrediction {
+  municipio_codigo: string;
+  municipio: string;
+  valor_real: number;
+  valor_predicho: number;
+  error: number;
+  error_absoluto: number;
+}
+
+export interface RegressionTreeResponse {
+  objetivo: string;
+  unidad_analisis: "Municipio";
+  target: { nombre: string; indicador_eda: string; definicion: string; nota_leakage: string };
+  variables_utilizadas: Array<{ variable: string; descripcion: string }>;
+  registros: {
+    municipios: number;
+    estadisticos_target: { minimo: number; maximo: number; promedio: number; mediana: number };
+  };
+  particion: { train: number; test: number; random_state: number; test_size: number; nota: string };
+  gridsearch: {
+    mejores_parametros: { max_depth: number; min_samples_split: number; min_samples_leaf: number };
+    mejor_mse_cv: number;
+    std_mse_cv: number;
+    combinaciones_evaluadas: number;
+    ajustes_cv: number;
+    cv: number;
+  };
+  metricas: { train: RegressionMetrics; test: RegressionMetrics };
+  baseline: { media_train: number; metricas_test: RegressionMetrics };
+  importancia_variables: Array<{ variable: string; importancia: number }>;
+  estructura_arbol: { profundidad: number; nodos: number; hojas: number };
+  real_vs_predicho: MunicipalPrediction[];
+  municipios_mayor_error: MunicipalPrediction[];
+  residuos: { promedio: number; minimo: number; maximo: number; mae: number };
+  interpretacion: string;
+  limitaciones: string[];
+}

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.schemas.responses import (
     ArbolClasificacionResponse,
+    ArbolRegresionResponse,
     DistribucionResponse,
     OutliersResponse,
     RegresionLogisticaResponse,
@@ -41,5 +42,15 @@ def get_decision_tree(
 ) -> ArbolClasificacionResponse:
     try:
         return service.get_decision_tree()
+    except FileNotFoundError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+
+
+@router.get("/arbol-regresion", response_model=ArbolRegresionResponse)
+def get_regression_tree(
+    service: DataService = Depends(get_data_service),
+) -> ArbolRegresionResponse:
+    try:
+        return service.get_regression_tree()
     except FileNotFoundError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error

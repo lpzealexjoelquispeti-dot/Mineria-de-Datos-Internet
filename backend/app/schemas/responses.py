@@ -172,3 +172,58 @@ class ArbolClasificacionResponse(BaseModel):
     verificacion_comparabilidad: dict[str, bool]
     interpretacion: str
     artefactos: dict[str, str]
+
+
+class RegressionMetrics(BaseModel):
+    mse: float = Field(ge=0)
+    rmse: float = Field(ge=0)
+    mae: float = Field(ge=0)
+    r2: float  # Puede ser negativo.
+
+
+class MunicipalPrediction(BaseModel):
+    municipio_codigo: str
+    municipio: str
+    valor_real: float = Field(ge=0, le=100)
+    valor_predicho: float
+    error: float
+    error_absoluto: float = Field(ge=0)
+
+
+class RegressionImportance(BaseModel):
+    variable: str
+    importancia: float = Field(ge=0, le=1)
+
+
+class RegressionMetricsDifference(BaseModel):
+    mse: float
+    rmse: float
+    mae: float
+    r2: float
+
+
+class ArbolRegresionResponse(BaseModel):
+    generado_en: str
+    objetivo: str
+    unidad_analisis: Literal["Municipio"]
+    referencia_academica: str
+    target: dict[str, str]
+    variables_utilizadas: list[dict[str, str]]
+    registros: dict[str, Any]
+    particion: dict[str, Any]
+    modelo_base: dict[str, Any]
+    gridsearch: dict[str, Any]
+    metricas: dict[str, RegressionMetrics]
+    unidades_metricas: dict[str, str]
+    baseline: dict[str, Any]
+    comparacion_baseline: list[dict[str, Any]]
+    diferencia_arbol_menos_baseline: RegressionMetricsDifference
+    importancia_variables: list[RegressionImportance]
+    suma_importancias: float = Field(ge=0, le=1.00000001)
+    estructura_arbol: dict[str, int]
+    real_vs_predicho: list[MunicipalPrediction]
+    residuos: dict[str, Any]
+    municipios_mayor_error: list[MunicipalPrediction]
+    interpretacion: str
+    limitaciones: list[str]
+    artefactos: dict[str, str]

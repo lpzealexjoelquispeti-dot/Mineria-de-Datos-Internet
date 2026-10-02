@@ -4,9 +4,9 @@
 
 Aplicación web de solo lectura para visualizar y explorar el análisis del acceso a Internet fijo y móvil en el departamento de La Paz a partir del **Censo de Población y Vivienda 2024**.
 
-El proyecto conserva el notebook y los resultados del EDA, añade pipelines reproducibles de regresión logística y árbol de decisión, expone los artefactos procesados mediante FastAPI y los presenta en un dashboard React. No incluye usuarios, autenticación, administración, pagos ni base de datos transaccional.
+El proyecto conserva el notebook y los resultados del EDA, añade pipelines reproducibles de regresión logística, árbol de clasificación y árbol de regresión municipal, expone los artefactos procesados mediante FastAPI y los presenta en un dashboard React. No incluye usuarios, autenticación, administración, pagos ni base de datos transaccional.
 
-La unidad de análisis es el registro de vivienda. El universo TIC comprende viviendas particulares (tipos 1–6) con personas presentes (ocupación 0/1). Los registros fuera de ese universo no se consideran viviendas sin Internet.
+La unidad de análisis del EDA y H3_1/H3_2 es el registro de vivienda; H3_3 usa una fila por municipio. El universo TIC comprende viviendas particulares (tipos 1–6) con personas presentes (ocupación 0/1). Los registros fuera de ese universo no se consideran viviendas sin Internet.
 
 ## Arquitectura
 
@@ -30,7 +30,7 @@ El notebook usa las funciones estadísticas centrales de `src/mining.py` para la
 
 - Python 3.12
 - Pandas y NumPy
-- scikit-learn para el pipeline predictivo y las métricas de clasificación
+- scikit-learn para los pipelines predictivos y las métricas de clasificación y regresión
 - statsmodels para la inferencia estadística con `Logit`
 - joblib para guardar el pipeline entrenado de forma reproducible
 - Matplotlib y seaborn para el EDA existente
@@ -181,6 +181,64 @@ Artefactos principales:
 
 El notebook académico es `notebooks/H3_2_Arbol_Clasificacion_Internet_LaPaz.ipynb`; importa `src.decision_tree_classification` y consume resultados reales, sin hardcodear métricas. La API los sirve mediante `GET /api/mineria/arbol-clasificacion`.
 
+## Árbol de Decisión — Regresión
+
+H3_3 predice el **porcentaje de viviendas con acceso a Internet de cada municipio de La Paz** a partir de características censales agregadas. Una observación es un municipio, frente a las viviendas individuales de H3_1/H3_2. Es un problema de regresión con `DecisionTreeRegressor`, target continuo `PORCENTAJE_ACCESO_INTERNET` entre 0 y 100; no se compara directamente con métricas de clasificación.
+
+El target conserva exactamente `pct_algun` del EDA: `v19e_f = 1 / universo TIC municipal × 100`, incluyendo respuestas sin especificar en el denominador. Se reutilizan la lectura y el diccionario de `src.pipeline`, la agregación de `src.mining` y la limpieza de H3_1/H3_2. El flujo se detiene si los códigos, nombres, denominadores o porcentajes discrepan de `outputs/tablas/municipios.csv` (tolerancia absoluta de 1e-8 puntos porcentuales). Los municipios se ordenan por código y no se duplican ni se generan observaciones sintéticas.
+
+Predictores finales:
+
+| Variable | Construcción municipal |
+|---|---|
+| `pct_urbano` | Porcentaje urbano sobre las respuestas de área válidas del universo TIC |
+| `pct_con_energia` | Porcentaje con electricidad; diccionario oficial: disponibilidad 1–4, ausencia 5 |
+| `pct_computadora` | Porcentaje con computadora/laptop/tablet entre respuestas determinadas |
+| `pct_celular` | Porcentaje con teléfono celular entre respuestas determinadas |
+| `promedio_habitaciones` | Media de códigos válidos 1–8; 8 significa ocho o más |
+| `promedio_personas` | Media de valores válidos 0–9999 |
+
+Los predictores se agregan sobre el mismo universo TIC, sin filtrar por acceso a Internet. Computadora y celular conservan la limpieza existente: 9 y vacíos son ausentes; no se convierten en No. Sus tasas utilizan respuestas determinadas por variable. Las medias excluyen valores inválidos. Se guardan conteos válidos por municipio y faltantes municipales en el JSON para auditar los denominadores. No se imputan microdatos antes de agregar.
+
+**Prevención de leakage:** una lista cerrada selecciona solo los seis predictores. Se excluyen Internet fijo/móvil/combinado, sus agregados, el target y los identificadores `municipio_codigo`/`municipio`. La imputación municipal por mediana está dentro del pipeline y se aprende exclusivamente de train o del subconjunto train de cada fold. No se aplica escalado.
+
+```bash
+python scripts/entrenar_arbol_regresion.py
+# Releer los microdatos originales en bloques:
+python scripts/entrenar_arbol_regresion.py --forzar-fuente
+```
+
+La partición reproducible usa `random_state=777` y `test_size=0.20`, **sin stratify**: se mantiene la convención del proyecto frente a 22 y 70/30 del [notebook oficial del docente](https://github.com/ealaurel/MINERIA_DATOS_2026_2/blob/main/h3_3_Arboles_de_decisi%C3%B3n_regresion.ipynb). Se guardan explícitamente los municipios train/test. Antes de ajustar se informan cantidad de municipios, partición, duplicados, NaN y estadísticos del target.
+
+`GridSearchCV` explora el producto cartesiano completo: profundidades 1–19, `min_samples_split` 2–9 y `min_samples_leaf` 1–4: **608 configuraciones, 3.040 ajustes CV y un reajuste final**. Usa CV=5 (KFold sin shuffle), `scoring="neg_mean_squared_error"`, `n_jobs=-1` y solo train. Se conserva `best_estimator_` y se guardan resultados completos, `best_params_`, `best_score_`, MSE CV positivo, desviación estándar y MSE de cada fold. Test queda reservado para la evaluación final.
+
+Se calculan **MSE, RMSE, MAE y R²** en train/test. MAE y RMSE se interpretan en puntos porcentuales, MSE en pp²; R² puede ser negativo y se conserva. `DummyRegressor(strategy="mean")` aprende únicamente la media de train y se compara en el mismo test. Se extraen importancias reales sin interpretarlas como efectos causales, estructura del árbol, predicciones identificadas y residuos (`real − predicho`). El árbol base se evalúa solo en train para ilustrar el problema.
+
+Artefactos agregados y modelo:
+
+- `outputs/modelado/dataset_regresion_municipal.csv`;
+- `outputs/modelado/metricas_arbol_regresion.json`;
+- `outputs/modelado/predicciones_arbol_regresion_test.csv`;
+- `outputs/modelado/importancia_variables_arbol_regresion.csv`;
+- `outputs/modelado/gridsearch_arbol_regresion.csv`;
+- `outputs/modelado/comparacion_baseline_arbol_regresion.csv`;
+- `outputs/modelado/particion_arbol_regresion.csv`;
+- `outputs/modelos/arbol_regresion.joblib`;
+- `outputs/graficos/arbol_regresion_niveles_0_3.png`;
+- `outputs/graficos/regresion_real_vs_predicho.png`;
+- `outputs/graficos/residuos_arbol_regresion.png`.
+
+El notebook `notebooks/H3_3_Arbol_Regresion_Internet_LaPaz.ipynb` reutiliza `src.decision_tree_regression`, ejecuta el flujo y narra resultados reales sin hardcodear cifras:
+
+```bash
+jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=900 notebooks/H3_3_Arbol_Regresion_Internet_LaPaz.ipynb
+python -m pytest -q tests
+```
+
+`GET /api/mineria/arbol-regresion` lee exclusivamente el JSON previamente calculado; no carga microdatos ni entrena durante una request. Si falta, devuelve 503. El dashboard añade **Árbol de Decisión — Regresión** bajo **Predicción territorial**, con métricas, municipios, hiperparámetros, estructura, importancia, Real vs. Predicho, comparación con baseline y errores municipales. Su carga es independiente, de modo que un fallo de H3_3 no bloquea H3_1/H3_2.
+
+**Limitaciones:** hay muchas menos observaciones que en los modelos individuales. Cada municipio pesa una vez, sin ponderar viviendas, y la evaluación depende de una única partición pequeña; la desviación CV no es un intervalo de confianza. No se modela dependencia espacial. Habitaciones está truncada en ocho o más; las tasas de equipamiento dependen de respuestas determinadas. Son asociaciones territoriales de acceso declarado en 2024, sin inferencia causal ni individual (riesgo de falacia ecológica). No se garantiza generalización a otros departamentos, años, países ni condiciones futuras.
+
 ## Backend
 
 Iniciar la API:
@@ -217,6 +275,7 @@ Por defecto CORS permite únicamente `http://localhost:5173` y `http://127.0.0.1
 | GET | `/api/mineria/distribucion` | Tasas municipales procesadas |
 | GET | `/api/mineria/regresion-logistica` | Resultados de la primera iteración guardados en `outputs/modelado/` |
 | GET | `/api/mineria/arbol-clasificacion` | Resultados H3_2, GridSearchCV, umbral ROC, importancias y comparación guardados |
+| GET | `/api/mineria/arbol-regresion` | Resultados H3_3 municipales: errores, CV, baseline, importancia y predicciones guardados |
 | GET | `/api/calidad` | `faltantes.csv` y auditorías del JSON |
 | GET | `/api/metadata` | Diccionario utilizado, fuente y proceso |
 | GET | `/api/hallazgos` | Hallazgo, hipótesis y conclusiones generados por el pipeline |
@@ -265,6 +324,8 @@ La página incluye:
 - sección de Regresión Logística con métricas, matriz de confusión, curva ROC, Odds Ratios y comparación train/test;
 - sección **Árbol de Decisión — Clasificación** con métricas, hiperparámetros, estructura, matriz, ROC e importancias agregadas;
 - comparación visual de Regresión Logística y Árbol de Decisión con los mismos casos de test;
+- sección **Predicción territorial — H3_3** con MAE/RMSE/MSE/R², Real vs. Predicho, baseline, importancia y tabla municipal;
+- separación entre clasificación individual (H3_1/H3_2) y regresión territorial (H3_3);
 - estados de carga, error y ausencia de datos;
 - diseño adaptable a escritorio, tableta y móvil.
 
@@ -314,14 +375,17 @@ Mineria-de-Datos-Internet/
 │   ├── mining.py
 │   ├── logistic_regression.py
 │   ├── decision_tree_classification.py
+│   ├── decision_tree_regression.py
 │   └── pipeline.py
 ├── scripts/
 │   ├── entrenar_regresion_logistica.py
-│   └── entrenar_arbol_clasificacion.py
+│   ├── entrenar_arbol_clasificacion.py
+│   └── entrenar_arbol_regresion.py
 ├── notebooks/
 │   ├── EDA_Internet_LaPaz.ipynb
 │   ├── Regresion_Logistica_Internet_LaPaz.ipynb
-│   └── H3_2_Arbol_Clasificacion_Internet_LaPaz.ipynb
+│   ├── H3_2_Arbol_Clasificacion_Internet_LaPaz.ipynb
+│   └── H3_3_Arbol_Regresion_Internet_LaPaz.ipynb
 ├── outputs/
 │   ├── datos/
 │   ├── graficos/
