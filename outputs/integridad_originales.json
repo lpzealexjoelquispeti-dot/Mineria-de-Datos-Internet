@@ -1,0 +1,38 @@
+[
+  {
+    "archivo": "Emigracion_CPV-2024.csv",
+    "bytes": 23806805,
+    "sha256": "853ce7d4c614740708c1e8a20acf944610ff0bc9788ea98d083145d2daf00a8f",
+    "sin_modificaciones": true
+  },
+  {
+    "archivo": "Cuestionario censal 2024.pdf",
+    "bytes": 21074992,
+    "sha256": "e304a6d02a0a7c1d63b73f3fab4159e6526e77e545d8545932c5f2002f117059",
+    "sin_modificaciones": true
+  },
+  {
+    "archivo": "Persona_CPV-2024.csv",
+    "bytes": 3087564948,
+    "sha256": "e2c5428b69a69b71be1384199d50f8de512178295e236c5d4a55439862c1e009",
+    "sin_modificaciones": true
+  },
+  {
+    "archivo": "Diccionario de variables CPV 2024.xlsx",
+    "bytes": 204479,
+    "sha256": "20e1f074145b8277ad18a71bc180a3e2f89f0b38fc9760bf88be0bc766e2db0e",
+    "sin_modificaciones": true
+  },
+  {
+    "archivo": "Mortalidad_CPV-2024.csv",
+    "bytes": 19297562,
+    "sha256": "745af80872fb2a6556630b76820a3b5faf0484354d37f3ea7be1ac4cadf2ed86",
+    "sin_modificaciones": true
+  },
+  {
+    "archivo": "Vivienda_CPV-2024.csv",
+    "bytes": 490862565,
+    "sha256": "f3cef44bcf103978734e86adf2c8c147a89adcb7146c78f78df7c409107a7aee",
+    "sin_modificaciones": true
+  }
+]

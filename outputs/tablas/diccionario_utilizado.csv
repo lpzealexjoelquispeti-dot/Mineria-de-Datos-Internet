@@ -1,0 +1,17 @@
+﻿variable,descripcion,codigos_o_rango,fuente
+idep,Código departamental: correspondencia con dep_res_cod; no definido directamente,Ver nota documental,Correspondencia auditada / limitación
+iprov,Componente provincial: idep sin cero + iprov se contrasta con prov_res_cod,Ver nota documental,Correspondencia auditada / limitación
+imun,Componente municipal: código provincial + imun se contrasta con mun_res_cod,Ver nota documental,Correspondencia auditada / limitación
+i00,Identificador candidato de registro; sin definición directa en el diccionario,Ver nota documental,Correspondencia auditada / limitación
+urbrur,Área Urbana - Rural,1: Urbana; 2: Rural,"VIVIENDA, fila 6"
+v01_tipoviv,1. La vivienda es: (Tipo de vivienda),"1: Casa; 2: Choza, pahuichi; 3: Departamento; 4: Cuarto(s) o habitación(es) suelta(s); 5: Vivienda improvisada o vivienda móvil; 6: Establecimiento no destinado para vivienda; 7: Hotel, hostal, residencial o alojamiento; 8: Hospital o clínica con internación; 9: Cuartel o establecimiento militar o policial; 10: Residencia u otro de adultos mayores; 11: Albergue de niñas(os) y adolescentes; 12: Recinto penitenciario o de reintegración; 13: Campamento de trabajo; 14: Otra (Instituto de rehabilitación, convento); 15: Persona que vive en la calle; 16: En tránsito: terminal, aeropuerto, puerto u otro","VIVIENDA, fila 13"
+v02_condocup,2. La vivienda esta: (Condición de ocupación de la vivienda),0: Ocupada con personas presentes sin Jefe; 1: Ocupada con personas presentes; 2: Ocupada con personas temporalmente ausentes; 3: Desocupada para alquilar y/o vender; 4: Desocupada terminándose de construir o reparar; 5: Desocupada abandonada,"VIVIENDA, fila 34"
+v09_energia,9. De donde proviene la energía eléctrica que usan en la vivienda,1: Servicio público de energía eléctrica; 2: Motor propio (Generador); 3: Panel solar; 4: Otro; 5: No tiene,"VIVIENDA, fila 110"
+v13_habitac,"13. Cuántos cuartos o habitaciones ocupan, sin contar baño y cocina",1: Uno; 2: Dos; 3: Tres; 4: Cuatro; 5: Cinco; 6: Seis; 7: Siete; 8: Ocho o más,"VIVIENDA, fila 152"
+v14_dormit,"14. De estos cuartos o habitaciones, Cuántos se utilizan solo para dormir",0: Cero; 1: Uno; 2: Dos; 3: Tres; 4: Cuatro; 5: Cinco; 6: Seis; 7: Siete; 8: Ocho o más,"VIVIENDA, fila 165"
+v19c_compu,"19.3. Su hogar tiene: Computadora, laptop o tablet",1: Sí; 2: No; 9: Sin especificar,"VIVIENDA, fila 307"
+v19d_celular,19.4. Su hogar tiene: Teléfono celular,1: Sí; 2: No; 9: Sin especificar,"VIVIENDA, fila 315"
+v19e_inetfijo,19.5. Su hogar tiene: Internet fijo en la vivienda,1: Sí; 2: No; 9: Sin especificar,"VIVIENDA, fila 323"
+v19f_inetmovil,19.6. Su hogar tiene: Internet móvil (megas o datos),1: Sí; 2: No; 9: Sin especificar,"VIVIENDA, fila 331"
+v19e_f,Internet fijo en la vivienda o internet móvil,1: Sí; 2: No; 9: Sin especificar,"VIVIENDA, fila 394"
+tot_pers,Total personas,0 - 9999,"VIVIENDA, fila 377"
