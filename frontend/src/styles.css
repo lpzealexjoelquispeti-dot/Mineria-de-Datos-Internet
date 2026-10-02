@@ -282,6 +282,16 @@ main {
 .association-positive { color: #126067; background: #dff3f1; }
 .association-negative { color: #984b3e; background: #fae8e3; }
 .model-disclaimer { margin: 16px 0 0; color: var(--muted); font-size: .76rem; line-height: 1.55; }
+.model-hero--tree { background: linear-gradient(120deg, #38210d, #7e4924); }
+.model-hero--tree .model-hero__facts strong { color: #ffd49a; }
+.model-context--tree { background: #f7ead9; }
+.tree-params { display: grid; gap: 10px; margin-top: 18px; }
+.tree-params div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px; border-radius: 9px; background: #f6f0e9; }
+.tree-params code { color: #714421; font-size: .8rem; }
+.tree-params strong { color: #38210d; font-size: 1.05rem; }
+.importance-chart { height: 350px; margin-top: 12px; }
+.model-card--comparison { margin-top: 18px; }
+.comparison-chart { height: 360px; margin-top: 12px; }
 
 .empty-state { display: grid; place-items: center; min-height: 220px; color: var(--muted); text-align: center; }
 .empty-state svg { color: #96a9b8; }

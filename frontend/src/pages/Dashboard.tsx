@@ -3,6 +3,7 @@ import { Activity, Database, RadioTower, Router, WifiOff } from "lucide-react";
 
 import { AreaChart } from "../components/AreaChart";
 import { DistributionChart } from "../components/DistributionChart";
+import { DecisionTreeSection } from "../components/DecisionTreeSection";
 import { FindingsSection } from "../components/FindingsSection";
 import { Header } from "../components/Header";
 import { KpiCard } from "../components/KpiCard";
@@ -75,6 +76,7 @@ export default function Dashboard() {
           <OutliersSection outliers={data.outliers} />
           <FindingsSection findings={data.hallazgos} />
           <LogisticRegressionSection model={data.regresion} />
+          <DecisionTreeSection model={data.arbol} />
 
           <footer className="method-footer">
             <div>

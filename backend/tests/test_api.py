@@ -1,3 +1,4 @@
+import csv
 import json
 from pathlib import Path
 
@@ -5,6 +6,7 @@ import httpx
 import pytest
 
 from app.main import app
+from app.services.data_service import DataService, get_data_service
 
 
 @pytest.fixture
@@ -83,3 +85,44 @@ async def test_regresion_logistica_uses_saved_results_without_leakage() -> None:
     ] + body["matriz_confusion_test"]["fn"] + body["matriz_confusion_test"][
         "tp"
     ] == body["particion"]["test"]
+
+
+@pytest.mark.anyio
+async def test_arbol_clasificacion_uses_saved_real_results() -> None:
+    root = Path(__file__).resolve().parents[2]
+    raw = json.loads(
+        (root / "outputs" / "modelado" / "metricas_arbol_clasificacion.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    response = await get("/api/mineria/arbol-clasificacion")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["target"]["nombre"] == "TIENE_ACCESO_INTERNET"
+    assert body["metricas"]["test"] == raw["metricas"]["test"]
+    assert body["matriz_confusion_test"]["matriz"] == raw["matriz_confusion_test"]["matriz"]
+    assert min(body["gridsearch"]["valores_evaluados"]["min_samples_split"]) >= 2
+    assert abs(body["importancia_variables"]["suma_agregada"] - 1) < 1e-8
+    assert all(body["verificacion_comparabilidad"].values())
+
+    with (root / "outputs" / "modelado" / "comparacion_modelos_clasificacion.csv").open(
+        encoding="utf-8", newline=""
+    ) as file:
+        comparison_csv = list(csv.DictReader(file))
+    assert [row["modelo"] for row in body["comparacion_modelos"]] == [
+        row["modelo"] for row in comparison_csv
+    ]
+    for api_row, csv_row in zip(body["comparacion_modelos"], comparison_csv, strict=True):
+        for metric in ("accuracy", "precision", "recall", "f1", "roc_auc"):
+            assert api_row[metric] == pytest.approx(float(csv_row[metric]))
+
+
+@pytest.mark.anyio
+async def test_arbol_clasificacion_missing_artifact_is_handled(tmp_path: Path) -> None:
+    app.dependency_overrides[get_data_service] = lambda: DataService(tmp_path)
+    try:
+        response = await get("/api/mineria/arbol-clasificacion")
+    finally:
+        app.dependency_overrides.clear()
+    assert response.status_code == 503
+    assert "entrenar_arbol_clasificacion.py" in response.json()["detail"]

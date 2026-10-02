@@ -150,3 +150,25 @@ class RegresionLogisticaResponse(BaseModel):
     coeficientes_principales: list[dict[str, Any]]
     statsmodels: dict[str, Any]
     interpretacion_primera_iteracion: str
+
+
+class ArbolClasificacionResponse(BaseModel):
+    objetivo: str
+    target: dict[str, Any]
+    variables_utilizadas: list[dict[str, Any]]
+    registros: dict[str, Any]
+    distribucion_clases_total: dict[str, Any]
+    particion: dict[str, Any]
+    gridsearch: dict[str, Any]
+    umbral_estandar: float
+    metricas: dict[str, dict[str, float]]
+    matriz_confusion_test: dict[str, Any]
+    classification_report_test: dict[str, Any]
+    roc: dict[str, Any]
+    seleccion_umbral_roc: dict[str, Any]
+    importancia_variables: dict[str, Any]
+    estructura_arbol: dict[str, Any]
+    comparacion_modelos: list[dict[str, Any]]
+    verificacion_comparabilidad: dict[str, bool]
+    interpretacion: str
+    artefactos: dict[str, str]

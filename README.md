@@ -4,7 +4,7 @@
 
 Aplicación web de solo lectura para visualizar y explorar el análisis del acceso a Internet fijo y móvil en el departamento de La Paz a partir del **Censo de Población y Vivienda 2024**.
 
-El proyecto conserva el notebook y los resultados del EDA, añade un pipeline Python reutilizable, expone los artefactos procesados mediante FastAPI y los presenta en un dashboard React. No incluye usuarios, autenticación, administración, pagos ni base de datos transaccional.
+El proyecto conserva el notebook y los resultados del EDA, añade pipelines reproducibles de regresión logística y árbol de decisión, expone los artefactos procesados mediante FastAPI y los presenta en un dashboard React. No incluye usuarios, autenticación, administración, pagos ni base de datos transaccional.
 
 La unidad de análisis es el registro de vivienda. El universo TIC comprende viviendas particulares (tipos 1–6) con personas presentes (ocupación 0/1). Los registros fuera de ese universo no se consideran viviendas sin Internet.
 
@@ -22,7 +22,7 @@ Censo 2024 (CSV + diccionario oficial)
       React + TypeScript + Vite
 ```
 
-FastAPI no abre los microdatos censales. `src.pipeline` realiza el trabajo intensivo una sola vez y genera tablas agregadas en `outputs/`. El backend carga esos archivos pequeños y los conserva en caché de proceso.
+FastAPI no abre los microdatos censales ni entrena modelos. `src.pipeline` y los scripts de entrenamiento realizan el trabajo intensivo una sola vez y generan artefactos en `outputs/`. El backend carga los JSON pequeños y los conserva en caché de proceso.
 
 El notebook usa las funciones estadísticas centrales de `src/mining.py` para la comparación departamental, las agregaciones geográficas y la detección IQR. Así se mantienen los mismos denominadores y la misma metodología entre el EDA y los resultados servidos.
 
@@ -151,6 +151,36 @@ jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeou
 
 Los resultados se sirven mediante `GET /api/mineria/regresion-logistica`. La sección **Regresión Logística** del dashboard consume ese endpoint y muestra métricas, matriz de confusión, curva ROC, train frente a test, coeficientes y Odds Ratios sin cifras hardcodeadas.
 
+## Árbol de Decisión — Clasificación
+
+H3_2 predice el mismo target binario `TIENE_ACCESO_INTERNET` de H3_1 y reutiliza directamente su universo TIC, construcción del target, exclusión del código 9, limpieza de variables y partición estratificada. Los predictores son los mismos: `urbrur`, `v01_tipoviv`, `v09_energia`, `v19c_compu`, `v19d_celular`, `v13_habitac` y `tot_pers`. Ninguna variable de acceso a Internet se usa como predictor.
+
+El pipeline aplica imputación por moda y one-hot encoding a categóricas, imputación por mediana a numéricas y `DecisionTreeClassifier(random_state=777)`, sin escalado. `GridSearchCV` usa cinco folds, `roc_auc`, `n_jobs=-1` y exclusivamente el conjunto de entrenamiento. Debido al tamaño censal, la búsqueda conserva todos los valores solicitados pero se ejecuta en dos etapas: profundidades 1–15 y luego el cruce de `min_samples_split` 2–9 con `min_samples_leaf` 1–5 en la mejor profundidad. No se reduce ni muestrea el dataset.
+
+Entrenar y regenerar artefactos:
+
+```bash
+python scripts/entrenar_arbol_clasificacion.py
+# Para releer el CSV nacional en lugar del cache departamental:
+python scripts/entrenar_arbol_clasificacion.py --forzar-fuente
+```
+
+Se calculan accuracy, precision, recall, F1 y ROC-AUC en train y test, matriz de confusión, reporte de clasificación y curva ROC. Además del umbral estándar 0,5, se informa un umbral que maximiza el índice de Youden, seleccionado con probabilidades out-of-fold de train. Las importancias se guardan por feature one-hot y agregadas por variable original.
+
+Artefactos principales:
+
+- `outputs/modelado/metricas_arbol_clasificacion.json`;
+- `outputs/modelado/matriz_confusion_arbol_test.csv`;
+- `outputs/modelado/importancia_variables_arbol.csv`;
+- `outputs/modelado/importancia_variables_arbol_agregada.csv`;
+- `outputs/modelado/predicciones_arbol_test.csv.gz`;
+- `outputs/modelado/gridsearch_arbol_clasificacion.csv`;
+- `outputs/modelado/comparacion_modelos_clasificacion.csv`;
+- `outputs/modelos/arbol_clasificacion.joblib`;
+- `outputs/graficos/arbol_clasificacion_niveles_0_3.png`.
+
+El notebook académico es `notebooks/H3_2_Arbol_Clasificacion_Internet_LaPaz.ipynb`; importa `src.decision_tree_classification` y consume resultados reales, sin hardcodear métricas. La API los sirve mediante `GET /api/mineria/arbol-clasificacion`.
+
 ## Backend
 
 Iniciar la API:
@@ -186,6 +216,7 @@ Por defecto CORS permite únicamente `http://localhost:5173` y `http://127.0.0.1
 | GET | `/api/mineria/outliers` | Outliers y límites IQR del JSON procesado |
 | GET | `/api/mineria/distribucion` | Tasas municipales procesadas |
 | GET | `/api/mineria/regresion-logistica` | Resultados de la primera iteración guardados en `outputs/modelado/` |
+| GET | `/api/mineria/arbol-clasificacion` | Resultados H3_2, GridSearchCV, umbral ROC, importancias y comparación guardados |
 | GET | `/api/calidad` | `faltantes.csv` y auditorías del JSON |
 | GET | `/api/metadata` | Diccionario utilizado, fuente y proceso |
 | GET | `/api/hallazgos` | Hallazgo, hipótesis y conclusiones generados por el pipeline |
@@ -232,6 +263,8 @@ La página incluye:
 - hallazgo, hipótesis y conclusiones del análisis;
 - filtros por área y métrica;
 - sección de Regresión Logística con métricas, matriz de confusión, curva ROC, Odds Ratios y comparación train/test;
+- sección **Árbol de Decisión — Clasificación** con métricas, hiperparámetros, estructura, matriz, ROC e importancias agregadas;
+- comparación visual de Regresión Logística y Árbol de Decisión con los mismos casos de test;
 - estados de carga, error y ausencia de datos;
 - diseño adaptable a escritorio, tableta y móvil.
 
@@ -280,12 +313,15 @@ Mineria-de-Datos-Internet/
 ├── src/
 │   ├── mining.py
 │   ├── logistic_regression.py
+│   ├── decision_tree_classification.py
 │   └── pipeline.py
 ├── scripts/
-│   └── entrenar_regresion_logistica.py
+│   ├── entrenar_regresion_logistica.py
+│   └── entrenar_arbol_clasificacion.py
 ├── notebooks/
 │   ├── EDA_Internet_LaPaz.ipynb
-│   └── Regresion_Logistica_Internet_LaPaz.ipynb
+│   ├── Regresion_Logistica_Internet_LaPaz.ipynb
+│   └── H3_2_Arbol_Clasificacion_Internet_LaPaz.ipynb
 ├── outputs/
 │   ├── datos/
 │   ├── graficos/
@@ -306,4 +342,6 @@ Mineria-de-Datos-Internet/
 - Los outliers se calculan sobre el porcentaje municipal de algún Internet con la regla de Tukey, `1,5 × IQR`, igual que en el EDA.
 - Un outlier es un territorio inusual frente a la distribución; no implica un error.
 - La relación urbano/rural es descriptiva y no demuestra causalidad.
+- Los modelos identifican asociaciones predictivas; las importancias y coeficientes no representan efectos causales.
+- El test se reserva para evaluación final. La optimización y la selección de umbral del árbol usan únicamente train.
 - No se mide velocidad, calidad o precio del servicio ni cambios temporales.

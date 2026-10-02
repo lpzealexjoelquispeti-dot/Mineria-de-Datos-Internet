@@ -1,6 +1,7 @@
 import type {
   AreaFilter,
   AreaResponse,
+  DecisionTreeResponse,
   DistribucionResponse,
   HallazgosResponse,
   LogisticRegressionResponse,
@@ -65,4 +66,6 @@ export const api = {
     request<MetadataResponse>("/api/metadata", signal),
   regresionLogistica: (signal?: AbortSignal) =>
     request<LogisticRegressionResponse>("/api/mineria/regresion-logistica", signal),
+  arbolClasificacion: (signal?: AbortSignal) =>
+    request<DecisionTreeResponse>("/api/mineria/arbol-clasificacion", signal),
 };

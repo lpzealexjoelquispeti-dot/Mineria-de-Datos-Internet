@@ -196,3 +196,69 @@ export interface LogisticRegressionResponse {
   };
   interpretacion_primera_iteracion: string;
 }
+
+export interface TreeImportance {
+  feature?: string;
+  variable_original: string;
+  categoria_codigo?: string | null;
+  categoria?: string | null;
+  importancia: number;
+}
+
+export interface ModelComparison extends LogisticMetrics {
+  modelo: string;
+}
+
+export interface DecisionTreeResponse {
+  objetivo: string;
+  target: LogisticRegressionResponse["target"];
+  variables_utilizadas: LogisticVariable[];
+  registros: LogisticRegressionResponse["registros"];
+  distribucion_clases_total: LogisticRegressionResponse["distribucion_clases_total"];
+  particion: LogisticRegressionResponse["particion"];
+  gridsearch: {
+    cv: number;
+    scoring: string;
+    n_jobs: number;
+    mejores_parametros: {
+      max_depth: number;
+      min_samples_split: number;
+      min_samples_leaf: number;
+    };
+    mejor_roc_auc_cv: number;
+    combinaciones_evaluadas: number;
+    ajustes_cv: number;
+    estrategia: string;
+    motivo_reduccion: string;
+  };
+  umbral_estandar: number;
+  metricas: { train: LogisticMetrics; test: LogisticMetrics };
+  matriz_confusion_test: LogisticRegressionResponse["matriz_confusion_test"];
+  classification_report_test: Record<string, unknown>;
+  roc: LogisticRegressionResponse["roc"];
+  seleccion_umbral_roc: {
+    umbral: number;
+    criterio: string;
+    origen: string;
+    indice_youden: number;
+    metricas_train: LogisticMetrics;
+    metricas_test: LogisticMetrics;
+    matriz_confusion_test: LogisticRegressionResponse["matriz_confusion_test"];
+  };
+  importancia_variables: {
+    transformadas: TreeImportance[];
+    agregadas: TreeImportance[];
+    suma_agregada: number;
+  };
+  estructura_arbol: {
+    profundidad: number;
+    nodos: number;
+    hojas: number;
+    visualizacion_max_depth: number;
+    nota_visualizacion: string;
+  };
+  comparacion_modelos: ModelComparison[];
+  verificacion_comparabilidad: Record<string, boolean>;
+  interpretacion: string;
+  artefactos: Record<string, string>;
+}
