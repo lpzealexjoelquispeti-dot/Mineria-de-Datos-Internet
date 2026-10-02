@@ -1,0 +1,157 @@
+{
+  "objetivo": "Estimar el porcentaje municipal de viviendas con acceso declarado a Internet en La Paz, Censo 2024.",
+  "unidad_analisis": "Municipio; cada municipio tiene igual peso en entrenamiento y evaluación.",
+  "target": {
+    "nombre": "pct_algun",
+    "unidad": "porcentaje (escala 0 a 100)",
+    "formula": "100 × viviendas con v19e_f = 1 / universo TIC municipal",
+    "sin_especificar": "Se conserva en el denominador; no se recodifica como No."
+  },
+  "fuentes": {
+    "fuente": "https://cpv2024.ine.gob.bo/index.php/principal/descargas/",
+    "fuentes_verificadas": {
+      "Vivienda_CPV-2024.csv": {
+        "sha256": "f3cef44bcf103978734e86adf2c8c147a89adcb7146c78f78df7c409107a7aee",
+        "bytes": 490862565
+      },
+      "Diccionario de variables CPV 2024.xlsx": {
+        "sha256": "20e1f074145b8277ad18a71bc180a3e2f89f0b38fc9760bf88be0bc766e2db0e",
+        "bytes": 204479
+      }
+    },
+    "registros_nacionales": 4490488,
+    "registros_lapaz": 1334496,
+    "universo_tic": 1069838,
+    "municipios": 87,
+    "target_sin_especificar": 30497,
+    "tasa_departamental_pct": 69.95460995029154,
+    "tasas_y_denominadores_coinciden_con_eda": true,
+    "faltantes_municipales": {
+      "pct_urbanas": 0,
+      "pct_computadora": 0,
+      "pct_celular": 0,
+      "pct_red_electrica": 0,
+      "pct_3_o_mas_habitaciones": 0,
+      "promedio_personas": 0
+    }
+  },
+  "referencia_docente": "https://github.com/ealaurel/MINERIA_DATOS_2026_2/blob/main/h3_3_Arboles_de_decisi%C3%B3n_regresion.ipynb",
+  "predictores": {
+    "pct_urbanas": "Viviendas urbanas (%)",
+    "pct_computadora": "Con computadora, laptop o tablet (%)",
+    "pct_celular": "Con teléfono celular (%)",
+    "pct_red_electrica": "Con electricidad de red pública (%)",
+    "pct_3_o_mas_habitaciones": "Con 3 o más habitaciones (%)",
+    "promedio_personas": "Personas por vivienda (promedio)"
+  },
+  "particion": {
+    "train": 60,
+    "test": 27,
+    "test_size": 0.3,
+    "random_state": 777,
+    "sin_municipios_compartidos": true
+  },
+  "validacion_cruzada": {
+    "folds": 5,
+    "criterio": "MSE mínimo en train",
+    "combinaciones": 608,
+    "mejor_mse_cv_pp2": 51.166268497394846,
+    "mejores_parametros": {
+      "max_depth": 7,
+      "min_samples_leaf": 1,
+      "min_samples_split": 7
+    }
+  },
+  "metricas": [
+    {
+      "modelo": "Promedio de entrenamiento",
+      "mse_cv_pp2": 158.845013586198,
+      "desviacion_mse_cv_pp2": 86.04307283226932,
+      "train_mse_pp2": 150.93019142785508,
+      "train_rmse_pp": 12.285364928558495,
+      "train_mae_pp": 9.655753993786679,
+      "train_r2": 0.0,
+      "test_mse_pp2": 140.35714189582896,
+      "test_rmse_pp": 11.847241953122632,
+      "test_mae_pp": 9.471503809380371,
+      "test_r2": -0.6496371009047843
+    },
+    {
+      "modelo": "Árbol inicial (profundidad 2)",
+      "mse_cv_pp2": 53.152913862596066,
+      "desviacion_mse_cv_pp2": 24.572728195782414,
+      "train_mse_pp2": 24.49125654999072,
+      "train_rmse_pp": 4.948864167664205,
+      "train_mae_pp": 4.047561013375693,
+      "train_r2": 0.8377312297937581,
+      "test_mse_pp2": 39.64699681169653,
+      "test_rmse_pp": 6.296586123582884,
+      "test_mae_pp": 5.101312277153939,
+      "test_r2": 0.5340233065691123
+    },
+    {
+      "modelo": "Árbol ajustado por CV",
+      "mse_cv_pp2": 51.166268497394846,
+      "desviacion_mse_cv_pp2": 25.05784938146688,
+      "train_mse_pp2": 4.240800867960088,
+      "train_rmse_pp": 2.0593204869471116,
+      "train_mae_pp": 1.5912527727592456,
+      "train_r2": 0.9719022362070799,
+      "test_mse_pp2": 36.590408494442194,
+      "test_rmse_pp": 6.0490006194777495,
+      "test_mae_pp": 4.692426736779002,
+      "test_r2": 0.5699478161610586
+    }
+  ],
+  "estructura_arbol": {
+    "profundidad": 7,
+    "hojas": 17,
+    "nodos": 33
+  },
+  "variables_importantes": [
+    {
+      "variable": "pct_celular",
+      "descripcion": "Con teléfono celular (%)",
+      "importancia": 0.8958204934981581
+    },
+    {
+      "variable": "pct_urbanas",
+      "descripcion": "Viviendas urbanas (%)",
+      "importancia": 0.047333730316401736
+    },
+    {
+      "variable": "pct_computadora",
+      "descripcion": "Con computadora, laptop o tablet (%)",
+      "importancia": 0.03247950742431169
+    },
+    {
+      "variable": "pct_red_electrica",
+      "descripcion": "Con electricidad de red pública (%)",
+      "importancia": 0.018184294549300047
+    },
+    {
+      "variable": "pct_3_o_mas_habitaciones",
+      "descripcion": "Con 3 o más habitaciones (%)",
+      "importancia": 0.004597985841227193
+    },
+    {
+      "variable": "promedio_personas",
+      "descripcion": "Personas por vivienda (promedio)",
+      "importancia": 0.0015839883706014104
+    }
+  ],
+  "versiones": {
+    "python": "3.12.10",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scikit_learn": "1.9.1",
+    "matplotlib": "3.11.1"
+  },
+  "limitaciones": [
+    "Solo 87 municipios; las métricas dependen de la partición y no prueban desempeño fuera de La Paz.",
+    "Los datos son de 2024: se estima una tasa contemporánea, no una tendencia ni un pronóstico futuro.",
+    "Las asociaciones municipales no describen efectos causales ni decisiones individuales de viviendas.",
+    "Las tasas conservan Sin especificar en el denominador; no representan el acceso de quienes no respondieron.",
+    "Las importancias corresponden a este árbol y pueden favorecer variables con más puntos de corte."
+  ]
+}

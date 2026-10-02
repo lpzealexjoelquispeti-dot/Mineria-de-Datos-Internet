@@ -1,0 +1,49 @@
+|--- Con teléfono celular (%) <= 84.539
+|   |--- Con teléfono celular (%) <= 77.567
+|   |   |--- Con computadora, laptop o tablet (%) <= 4.574
+|   |   |   |--- value: [33.051]
+|   |   |--- Con computadora, laptop o tablet (%) >  4.574
+|   |   |   |--- Con 3 o más habitaciones (%) <= 17.763
+|   |   |   |   |--- value: [43.275]
+|   |   |   |--- Con 3 o más habitaciones (%) >  17.763
+|   |   |   |   |--- Con electricidad de red pública (%) <= 72.158
+|   |   |   |   |   |--- value: [39.902]
+|   |   |   |   |--- Con electricidad de red pública (%) >  72.158
+|   |   |   |   |   |--- value: [35.100]
+|   |--- Con teléfono celular (%) >  77.567
+|   |   |--- Viviendas urbanas (%) <= 12.045
+|   |   |   |--- Con teléfono celular (%) <= 79.677
+|   |   |   |   |--- value: [41.890]
+|   |   |   |--- Con teléfono celular (%) >  79.677
+|   |   |   |   |--- Con computadora, laptop o tablet (%) <= 6.413
+|   |   |   |   |   |--- value: [46.017]
+|   |   |   |   |--- Con computadora, laptop o tablet (%) >  6.413
+|   |   |   |   |   |--- Con computadora, laptop o tablet (%) <= 11.563
+|   |   |   |   |   |   |--- Con electricidad de red pública (%) <= 79.616
+|   |   |   |   |   |   |   |--- value: [52.082]
+|   |   |   |   |   |   |--- Con electricidad de red pública (%) >  79.616
+|   |   |   |   |   |   |   |--- value: [47.790]
+|   |   |   |   |   |--- Con computadora, laptop o tablet (%) >  11.563
+|   |   |   |   |   |   |--- value: [47.650]
+|   |   |--- Viviendas urbanas (%) >  12.045
+|   |   |   |--- Con teléfono celular (%) <= 81.894
+|   |   |   |   |--- value: [51.624]
+|   |   |   |--- Con teléfono celular (%) >  81.894
+|   |   |   |   |--- Con electricidad de red pública (%) <= 72.642
+|   |   |   |   |   |--- value: [63.136]
+|   |   |   |   |--- Con electricidad de red pública (%) >  72.642
+|   |   |   |   |   |--- value: [56.219]
+|--- Con teléfono celular (%) >  84.539
+|   |--- Con teléfono celular (%) <= 91.717
+|   |   |--- Con computadora, laptop o tablet (%) <= 14.838
+|   |   |   |--- value: [61.243]
+|   |   |--- Con computadora, laptop o tablet (%) >  14.838
+|   |   |   |--- Con electricidad de red pública (%) <= 91.670
+|   |   |   |   |--- Personas por vivienda (promedio) <= 2.404
+|   |   |   |   |   |--- value: [72.433]
+|   |   |   |   |--- Personas por vivienda (promedio) >  2.404
+|   |   |   |   |   |--- value: [68.400]
+|   |   |   |--- Con electricidad de red pública (%) >  91.670
+|   |   |   |   |--- value: [60.897]
+|   |--- Con teléfono celular (%) >  91.717
+|   |   |--- value: [86.978]

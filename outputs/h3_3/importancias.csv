@@ -1,0 +1,7 @@
+﻿variable,descripcion,importancia
+pct_celular,Con teléfono celular (%),0.8958204934981581
+pct_urbanas,Viviendas urbanas (%),0.047333730316401736
+pct_computadora,"Con computadora, laptop o tablet (%)",0.03247950742431169
+pct_red_electrica,Con electricidad de red pública (%),0.018184294549300047
+pct_3_o_mas_habitaciones,Con 3 o más habitaciones (%),0.004597985841227193
+promedio_personas,Personas por vivienda (promedio),0.0015839883706014104
