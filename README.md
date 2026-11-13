@@ -6,7 +6,7 @@ Aplicación web de solo lectura para visualizar y explorar el análisis del acce
 
 El proyecto conserva el notebook y los resultados del EDA, añade pipelines reproducibles de regresión logística, árbol de clasificación y árbol de regresión municipal, expone los artefactos procesados mediante FastAPI y los presenta en un dashboard React. No incluye usuarios, autenticación, administración, pagos ni base de datos transaccional.
 
-La unidad de análisis del EDA y H3_1/H3_2 es el registro de vivienda; H3_3 usa una fila por municipio. El universo TIC comprende viviendas particulares (tipos 1–6) con personas presentes (ocupación 0/1). Los registros fuera de ese universo no se consideran viviendas sin Internet.
+La unidad de análisis del EDA y H3_1/H3_2 es el registro de vivienda. H3_3 y H4_1 usan una fila por municipio. El universo TIC comprende viviendas particulares (tipos 1–6) con personas presentes (ocupación 0/1). Los registros fuera de ese universo no se consideran viviendas sin Internet.
 
 ## Arquitectura
 
@@ -256,6 +256,18 @@ python -m pytest -q tests
 
 **Limitaciones:** hay muchas menos observaciones que en los modelos individuales. Cada municipio pesa una vez, sin ponderar viviendas, y la evaluación depende de una única partición pequeña; la desviación CV no es un intervalo de confianza. No se modela dependencia espacial. La media de habitaciones A aproxima la categoría ocho o más; B evita esa aproximación pero agrupa la cantidad en dos categorías. La selección A/B puede volver optimista el mejor MSE CV; el test reservado es la evaluación externa a esa selección. Las tasas de equipamiento dependen de respuestas determinadas. Son asociaciones territoriales de acceso declarado en 2024, sin inferencia causal ni individual (riesgo de falacia ecológica). No se garantiza generalización a otros departamentos, años, países ni condiciones futuras.
 
+## H4_1 · Segmentación municipal con K-Means
+
+El notebook agrupa los municipios de La Paz según los porcentajes de viviendas con Internet fijo y móvil del Censo 2024. Lee la tabla del EDA incluida en el repositorio (`outputs/tablas/municipios.csv`), por lo que se puede ejecutar desde un clon nuevo con las dependencias de `requirements.txt`. [Abrir el notebook H4_1](notebooks/H4_1_KMeans_Internet_LaPaz.ipynb)
+
+El análisis estandariza ambas variables, compara la inercia y la silueta para varios valores de *k* y selecciona el de mayor silueta media. Para cada perfil muestra su tamaño, las tasas medias y un municipio representativo. Cada municipio pesa una vez.
+
+```bash
+jupyter nbconvert --to notebook --execute --inplace notebooks/H4_1_KMeans_Internet_LaPaz.ipynb
+```
+
+En `outputs/modelado/`, `kmeans_municipios.csv` identifica el perfil de cada municipio, `kmeans_perfiles.csv` resume los grupos y `kmeans_evaluacion.csv` permite revisar la elección de *k*.
+
 ## Backend
 
 Iniciar la API:
@@ -404,7 +416,8 @@ Mineria-de-Datos-Internet/
 │   ├── EDA_Internet_LaPaz.ipynb
 │   ├── Regresion_Logistica_Internet_LaPaz.ipynb
 │   ├── H3_2_Arbol_Clasificacion_Internet_LaPaz.ipynb
-│   └── H3_3_Arbol_Regresion_Internet_LaPaz.ipynb
+│   ├── H3_3_Arbol_Regresion_Internet_LaPaz.ipynb
+│   └── H4_1_KMeans_Internet_LaPaz.ipynb
 ├── outputs/
 │   ├── datos/
 │   ├── graficos/
